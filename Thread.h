@@ -11,6 +11,23 @@ typedef void (*voidFn)();
 
 class Thread {
 
+
+    /**
+     * A copy constructor
+     * @param thread the thread which copies
+     */
+    Thread(const Thread &thread);
+    /**
+     * A move constructor
+     * @param thread the thread which move
+     */
+    Thread(const Thread && thread);
+    /**
+     * A Destructor.
+     * Destruct the thread object.
+     */
+    ~Thread();
+
     Thread(void (*func)(void));
 
     int getState();
@@ -19,7 +36,7 @@ class Thread {
 
     voidFn getFunction();
 
-protected:
+private:
     int state;
     int quantums_num;
     void (*function)(void);

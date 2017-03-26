@@ -19,3 +19,11 @@ voidFn Thread::getFunction(){
     return function;
 }
 
+Thread::Thread(const Thread &&thread) {
+//Todo
+}
+
+Thread::~Thread() {
+
+}
+
