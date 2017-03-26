@@ -1,0 +1,3 @@
+/Users/eladbendavid/CLionProjects/project2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/eladbendavid/CLionProjects/project2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/eladbendavid/CLionProjects/project2/cmake-build-debug/CMakeFiles/os2.dir

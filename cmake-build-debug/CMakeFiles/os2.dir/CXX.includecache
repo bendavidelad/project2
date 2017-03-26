@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/eladbendavid/CLionProjects/project2/Thread.cpp
+Thread.h
+/Users/eladbendavid/CLionProjects/project2/Thread.h
+
+/Users/eladbendavid/CLionProjects/project2/Thread.h
+
+/Users/eladbendavid/CLionProjects/project2/UserLevelManager.cpp
+UserLevelManager.h
+/Users/eladbendavid/CLionProjects/project2/UserLevelManager.h
+
+/Users/eladbendavid/CLionProjects/project2/UserLevelManager.h
+queue
+-
+iostream
+-
+list
+-
+unordered_map
+-
+
+/Users/eladbendavid/CLionProjects/project2/main.cpp
+queue
+-
+iostream
+-
+list
+-
+unordered_map
+-
+
+/Users/eladbendavid/CLionProjects/project2/uthreads.cpp
+uthreads.h
+/Users/eladbendavid/CLionProjects/project2/uthreads.h
+
+/Users/eladbendavid/CLionProjects/project2/uthreads.h
+Thread.h
+/Users/eladbendavid/CLionProjects/project2/Thread.h
+

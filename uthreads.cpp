@@ -22,9 +22,7 @@
  * function with non-positive quantum_usecs.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_init(int quantum_usecs){
-
-}
+int uthread_init(int quantum_usecs);
 
 /*
  * Description: This function creates a new thread, whose entry point is the
