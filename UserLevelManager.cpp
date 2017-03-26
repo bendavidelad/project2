@@ -4,3 +4,7 @@
 
 #include "UserLevelManager.h"
 ////////
+void eladKaki(){
+return;
+
+}
