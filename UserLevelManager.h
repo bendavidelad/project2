@@ -10,7 +10,7 @@
 #include <list>
 #include <unordered_map>
 using namespace std;
-
+typedef priority_queue<int, vector<int>, comparator> minHeap;
 struct comparator {
     bool operator()(int i, int j) {
         return i > j;
@@ -19,23 +19,39 @@ struct comparator {
 
 class UserLevelManager {
 public:
-    UserLevelManager(int maxNumOfThreads){
-        hashMap = new unordered_map<int, int>;
+    /**
+     * the construuctor
+     * @param maxNumOfThreads
+     * @return null
+     */
+    UserLevelManager(int maxNumOfThreads);
 
+    minHeap getMinHeap();
+
+    list<int> getLinkedList();
+
+    unordered_map<int, int> getHashMap();
+
+    void addQuantumNum(){
+        numOfQuantum++;
+    }
+
+    int getQuantumNum(){
+        return numOfQuantum;
     }
 
 
+
 private:
-    priority_queue<int, std::vector<int>, comparator> minHeap;
-
-
-    list<int> linkedList;
-
+    // the stl that contains the deleted threads id's
+    minHeap *minHeapDeletedThreads;
+    //contains the ready states threads
+    list<int> *linkedList;
+    //contains all the threads
     unordered_map<int , int> *hashMap;
+    int numOfQuantum;
 
-
-    //std:pair<int,int> shopping(3,4);
-
+    //std:pair<int,int> shopping(3,4);TODO font forget to kaki
 
 };
 
