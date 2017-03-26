@@ -25,14 +25,15 @@ UserLevelManager user;
  * function with non-positive quantum_usecs.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_init(int quantum_usecs){
+int uthread_init(int quantum_usecs) {
     try {
         user = UserLevelManager(quantum_usecs);
-    }catch (const std::bad_alloc & e){
-    cerr << ERROR_MSG + BAD_ALLOC_MSG <<endl;
+    } catch (const std::bad_alloc &e) {
+        cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
     return 0;
+}
 
 
 /*
