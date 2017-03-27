@@ -9,15 +9,16 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
+using namespace std;
+
 static const string ERROR_MSG = "system error:";
 static const string BAD_ALLOC_MSG = "bad allocation occur";
-using namespace std;
-typedef priority_queue<int, vector<int>, comparator> minHeap;
 struct comparator {
     bool operator()(int i, int j) {
         return i > j;
     }
 };
+typedef priority_queue<int, vector<int>, comparator> minHeap;
 
 class UserLevelManager {
 public:
@@ -36,11 +37,16 @@ public:
      * @param matrix the matrix which move
      */
     UserLevelManager(const UserLevelManager && user);
+
+    UserLevelManager& operator=(const UserLevelManager& other);
+
+
     /**
      * A Destructor.
      * Destruct the point object.
      */
     ~UserLevelManager();
+
 
 
     /**

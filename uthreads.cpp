@@ -46,7 +46,15 @@ int uthread_init(int quantum_usecs) {
  * Return value: On success, return the ID of the created thread.
  * On failure, return -1.
 */
-int uthread_spawn(void (*f)(void));
+int uthread_spawn(void (*f)(void)){
+
+
+
+
+
+
+    return 0;
+}
 
 
 /*
