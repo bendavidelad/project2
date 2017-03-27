@@ -7,7 +7,6 @@
  */
 
 #define MAX_THREAD_NUM 100 /* maximal number of threads */
-#define STACK_SIZE 4096 /* stack size per thread (in bytes) */
 
 /* External interface */
 
@@ -15,6 +14,12 @@
 using namespace std;
 
 UserLevelManager user;
+
+
+int makeThreadReady(int tid){
+    user.getHashMap().at(tid)->setState(READY);
+    user.getLinkedList()->push_back(tid);
+}
 
 
 /*
@@ -47,13 +52,23 @@ int uthread_init(int quantum_usecs) {
  * On failure, return -1.
 */
 int uthread_spawn(void (*f)(void)){
-    Thread thread = new
-
-
-
-
-
-    return 0;
+    if(user.getHashMap().size() == user.getMaxthreadNum()){
+        return  -1;
+    }
+    std::shared_ptr<Thread> thread = new Thread(f);
+    int tid;
+    if(user.getMinHeap().empty()){
+        tid = user.getThreadCounter();
+        user.addThreadCounter();
+    } else{
+        tid = user.getMinHeap().top();
+        user.getMinHeap().pop();
+    }
+    thread->setId(tid);
+    std::pair<int , shared_ptr<Thread>> newThread(tid , thread);
+    user.getHashMap().insert(newThread);
+    makeThreadReady(tid);
+    return tid;
 }
 
 
@@ -136,3 +151,4 @@ int uthread_get_total_quantums();
  * Return value: On success, return the number of quantums of the thread with ID tid. On failure, return -1.
 */
 int uthread_get_quantums(int tid);
+

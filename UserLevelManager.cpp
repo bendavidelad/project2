@@ -4,8 +4,9 @@
 using namespace std;
 UserLevelManager::UserLevelManager(int maxNumOfThreads) {
     numOfQuantum = 0;
+    threadCounter = 0;
     maxThredsNum = maxNumOfThreads;
-    hashMap = new unordered_map<int, int>;
+    hashMap = new unordered_map<int, shared_ptr<Thread>>;
     linkedList = new list<int>;
     minHeapDeletedThreads = new priority_queue<int, vector<int>, comparator>;
 }
@@ -17,7 +18,7 @@ list<int> *UserLevelManager::getLinkedList() {
     return nullptr;
 }
 
-unordered_map<int, int> UserLevelManager::getHashMap() {
+unordered_map<int, shared_ptr<Thread>> UserLevelManager::getHashMap() {
     return *hashMap;
 }
 
@@ -54,5 +55,17 @@ UserLevelManager &UserLevelManager::operator=(const UserLevelManager &other) {
     this->minHeapDeletedThreads = other.minHeapDeletedThreads;
     this->numOfQuantum = other.numOfQuantum;
     return *this;
+}
+
+unsigned int UserLevelManager::getThreadCounter() {
+    return threadCounter;
+}
+
+void UserLevelManager::addThreadCounter() {
+    threadCounter++;
+}
+
+int UserLevelManager::getMaxthreadNum() {
+    return maxThredsNum;
 }
 

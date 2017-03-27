@@ -21,7 +21,7 @@ struct comparator {
         return i > j;
     }
 };
-typedef std::priority_queue<int, std::vector<int>, comparator> minHeap;
+typedef std::priority_queue< int, std::vector<int>, comparator> minHeap;
 
 class UserLevelManager {
 public:
@@ -73,7 +73,7 @@ public:
      *
      * @return
      */
-    std::unordered_map<int, int> getHashMap();
+    std::unordered_map<int, std::shared_ptr<Thread>> getHashMap();
     /**
      *
      */
@@ -83,6 +83,12 @@ public:
      * @return
      */
     int getQuantumNum();
+
+    unsigned int getThreadCounter();
+
+    void addThreadCounter();
+
+    int getMaxthreadNum();
 
 
 
@@ -97,6 +103,7 @@ private:
     std::unordered_map<int ,std::shared_ptr<Thread>> *hashMap;
     int numOfQuantum;
     int maxThredsNum;
+    unsigned int threadCounter;
 
     //std:pair<int,int> shopping(3,4);TODO font forget to kaki
 

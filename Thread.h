@@ -11,7 +11,7 @@ typedef void (*voidFn)();
 
 class Thread {
 
-
+public:
     /**
      * A copy constructor
      * @param thread the thread which copies
@@ -36,10 +36,17 @@ class Thread {
 
     voidFn getFunction();
 
+    void setId(int id);
+
+    void setState(int state);
+
 private:
+
     int state;
+    int id;
     int quantums_num;
     void (*function)(void);
+    void* stack;
 
 };
 
