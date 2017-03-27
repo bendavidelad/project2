@@ -55,7 +55,7 @@ int uthread_spawn(void (*f)(void)){
     if(user.getHashMap().size() == user.getMaxthreadNum()){
         return  -1;
     }
-    std::shared_ptr<Thread> thread = shared_ptr<new Thread(f)>;
+    std::shared_ptr<Thread> thread(new Thread(f));
     int tid;
     if(user.getMinHeap().empty()){
         tid = user.getThreadCounter();
@@ -153,7 +153,7 @@ int uthread_get_total_quantums(){
  * Return value: On success, return the number of quantums of the thread with ID tid. On failure, return -1.
 */
 int uthread_get_quantums(int tid){
-    if (user.getHashMap().find(tid) == user.getHashMap().end){
+    if (user.getHashMap().find(tid) == user.getHashMap().end()){
         return -1;
     } else{
         return user.getHashMap().at(tid)->getQuantums();
