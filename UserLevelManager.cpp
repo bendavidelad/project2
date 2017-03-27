@@ -1,7 +1,7 @@
 #include "UserLevelManager.h"
 
 
-
+using namespace std;
 UserLevelManager::UserLevelManager(int maxNumOfThreads) {
     numOfQuantum = 0;
     maxThredsNum = maxNumOfThreads;

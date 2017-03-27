@@ -12,7 +12,7 @@
 /* External interface */
 
 #include "UserLevelManager.h"
-
+using namespace std;
 
 UserLevelManager user;
 
@@ -47,7 +47,7 @@ int uthread_init(int quantum_usecs) {
  * On failure, return -1.
 */
 int uthread_spawn(void (*f)(void)){
-
+    Thread thread = new
 
 
 

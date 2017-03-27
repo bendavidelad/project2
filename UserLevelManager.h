@@ -9,16 +9,19 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
-using namespace std;
+#include "Thread.h"
+#include <memory>
 
-static const string ERROR_MSG = "system error:";
-static const string BAD_ALLOC_MSG = "bad allocation occur";
+//typedef std::vector<std::shared_ptr<int>> threadPtrPrVec;
+
+static const std::string ERROR_MSG = "system error:";
+static const std::string BAD_ALLOC_MSG = "bad allocation occur";
 struct comparator {
     bool operator()(int i, int j) {
         return i > j;
     }
 };
-typedef priority_queue<int, vector<int>, comparator> minHeap;
+typedef std::priority_queue<int, std::vector<int>, comparator> minHeap;
 
 class UserLevelManager {
 public:
@@ -65,12 +68,12 @@ public:
      *
      * @return
      */
-    list<int>* getLinkedList();
+    std::list<int>* getLinkedList();
     /**
      *
      * @return
      */
-    unordered_map<int, int> getHashMap();
+    std::unordered_map<int, int> getHashMap();
     /**
      *
      */
@@ -89,9 +92,9 @@ private:
     // the stl that contains the deleted threads id's
     minHeap *minHeapDeletedThreads;
     //contains the ready states threads
-    list<int> *linkedList;
+    std::list<int> *linkedList;
     //contains all the threads
-    unordered_map<int , int> *hashMap;
+    std::unordered_map<int ,std::shared_ptr<Thread>> *hashMap;
     int numOfQuantum;
     int maxThredsNum;
 
