@@ -1,3 +1,4 @@
+#include <setjmp.h>
 #include "uthreads.h"
 
 
@@ -6,7 +7,6 @@
  * Author: OS, os@cs.huji.ac.il
  */
 
-#define MAX_THREAD_NUM 100 /* maximal number of threads */
 
 /* External interface */
 
@@ -30,13 +30,14 @@ void makeThreadReady(int tid){
  * function with non-positive quantum_usecs.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_init(int quantum_usecs) {
+int uthread_init(unsigned int quantum_usecs) {
     try {
         user = UserLevelManager(quantum_usecs);
     } catch (const std::bad_alloc &e) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
+    //uthread_spawn(siglongjmp())
     return 0;
 }
 

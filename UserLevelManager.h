@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include "Thread.h"
 #include <memory>
+#define MAX_THREAD_NUM 100 /* maximal number of threads */
 
 //typedef std::vector<std::shared_ptr<int>> threadPtrPrVec;
 
@@ -57,7 +58,7 @@ public:
      * @param maxNumOfThreads
      * @return
      */
-    UserLevelManager(int maxNumOfThreads);
+    UserLevelManager(unsigned int quantum_usecs);
 
     /**
      *
@@ -104,6 +105,7 @@ private:
     int numOfQuantum;
     int maxThredsNum;
     unsigned int threadCounter;
+    unsigned int quantomUsecs;
 
     //std:pair<int,int> shopping(3,4);TODO font forget to kaki
 

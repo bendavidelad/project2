@@ -2,10 +2,11 @@
 
 
 using namespace std;
-UserLevelManager::UserLevelManager(int maxNumOfThreads) {
+UserLevelManager::UserLevelManager(unsigned int quantum_usecs) {
     numOfQuantum = 0;
     threadCounter = 0;
-    maxThredsNum = maxNumOfThreads;
+    maxThredsNum = MAX_THREAD_NUM;
+    quantomUsecs = quantum_usecs;
     hashMap = new unordered_map<int, shared_ptr<Thread>>;
     linkedList = new list<int>;
     minHeapDeletedThreads = new priority_queue<int, vector<int>, comparator>;
