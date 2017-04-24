@@ -37,8 +37,10 @@ int main(int argc, char const *argv[])
 
     std::unordered_map<int , int> hashMap;
     std:pair<int,int> shopping(3,4);
+    pair<int,int> shopping1(5,4);
     hashMap.insert(shopping);
+    hashMap.insert(shopping1);
     cout << hashMap.at(3) << endl;
-//    cout << hashMap.at(4) << endl;
+    cout << hashMap.erase(6) << endl;
 
 }
