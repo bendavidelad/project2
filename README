@@ -1,0 +1,103 @@
+shaked571, bendavidelad
+Refael Shaked Greenfeld (305030868), Elad Ben David (203281050)
+EX: 1
+
+FILES:
+osm.cpp - the implementation of the function that measure times.
+
+REMARKS:
+
+ANSWERS:
+
+Task1:
+
+mkdir("Welcome", 0775)                  = 0 :
+
+-Creats a directory named "Welcome". with the following permissions-
+-Special     	          User	                Group	                Other
+-setuid is unset  	can read	        can read	       can read
+-setgid is unset	 can write	        can write	       cannot write
+-Sticky bit is unset	can execute	        can execute	       can execute
+
+mkdir("Welcome/To", 0775)               = 0:
+
+-Creats a directory named "To" under "Welcome".with the following permissions-
+-Special     	          User	                Group	                Other
+-setuid is unset  	can read	        can read	       can read
+-setgid is unset	        can write	        can write	       cannot write
+-Sticky bit is unset	can execute	        can execute	       can execute
+
+open("Welcome/To/OS2016", O_WRONLY|O_CREAT|O_TRUNC, 0666) = 3:
+
+-open the file "OS2016" with  writing only premission.if the file exists and it is a regular 
+file and the file is successfully opened it's length is truncated to zero. In addition, 
+if the file - -exists open will faile
+-with the following permissions-
+-Special     	          User	                  Group	                Other
+setuid is unset		can read		can read		can read
+setgid is unset		can write		can write		can write
+Sticky bit is unset	cannot execute		cannot execute		cannot execute
+-
+
+
+fstat(3, {st_mode=S_IFREG|0644, st_size=0, ...}) = 0:
+
+fstat() retrieve information about the file pointed to  by
+pathname , the file about which information is to be retrieved is specified by the file descriptor fd.
+The file is opened as a regural file and is total size is 0 bytes.
+The file is with e following permissions-
+-Special     	          User	                  Group                   Other
+setuid is unset		can read		can read		can read
+setgid is unset		can write		cannot write		cannot write
+Sticky bit is unset	cannot execute		cannot execute		cannot execute
+
+
+write(3, "                                "..., 192) = 192:
+
+-Write in to the file it just open, the following string "                                " with
+ up to 192 bytes from the buffer.
+
+close(3)                                = 0:
+
+It close the file it worked on.with succsses.
+
+unlink("Welcome/To/OS2016")             = 0:
+
+Remove the specified file with succsses.
+
+rmdir("Welcome/To/")                    = 0:
+
+Remove the following directory with succsses.
+
+rmdir("Welcome/")                       = 0:
+
+Remove the following directory with succsses.
+
+exit_group(0)                           = ?:
+
+Exit all thread in the process,and because the system called is not returned we recieve "?". 
++++ exited with 0 +++
+
+Task2 :
+General time checking - we have used the getTimeOfDay function in order to measure the 
+time it takes to do certain operations.
+the time we got is in microseconds so we multiplied it by 1000 to get nanoseconds.
+we have also used each time couple of operations , and divided by that number of operations
+in order to get a more accurate calculation.
+
+Operation time - the operations we used are regular arithmetic operations like adding or substructing.
+
+function time - the operations we used are just calling for an empty function , in order to get exactly 
+the time it takes to call a function.
+
+syscall time - the operations we used are just the OSM_NULLSYSCALL as mentioned in the exercise.
+
+disk time - not implemented.
+
+
+
+
+
+
+
+
