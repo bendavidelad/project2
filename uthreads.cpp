@@ -72,6 +72,7 @@ void timer_handler(int sig)
 {
     int runningThreadId = user->getLinkedList()->front();
     saveCurThread();
+    deleteSyncList(runningThreadId);
     makeThreadReady(runningThreadId);
     runNextThread();
 
@@ -176,7 +177,7 @@ int uthread_terminate(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-
+    deleteSyncList(tid);
     user->getHashMap().erase(tid);
     user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
@@ -190,6 +191,7 @@ int uthread_terminate(int tid){
         timeBoot();
     } else {
         user->getLinkedList()->remove(tid);
+
     }
     return 0;
 }
@@ -214,6 +216,7 @@ int uthread_block(int tid){
         saveCurThread();
         user->getHashMap().at(tid)->setState(2);
         runNextThread();
+        deleteSyncList(tid);
         timeBoot();
    } else if (user->getHashMap().at(tid)->getState() == 0){
         user->getLinkedList()->remove(tid);
@@ -259,6 +262,7 @@ int uthread_resume(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_sync(int tid){
+    saveCurThread();
 
 }
 

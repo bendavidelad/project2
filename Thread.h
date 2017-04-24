@@ -51,6 +51,10 @@ public:
         return *syncList;
     }
 
+    void addThreadToSyncList(int tid){
+        
+    }
+
     void bootSyncList();
 private:
 
