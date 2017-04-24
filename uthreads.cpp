@@ -208,7 +208,7 @@ int uthread_terminate(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_block(int tid){
-    if ((tid == 0) || (user->getHashMap().at(tid) == NULL)){
+    if ((tid == 0) || (user->getHashMap().find(tid) == user->getHashMap().end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
@@ -235,7 +235,7 @@ int uthread_block(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_resume(int tid){
-    if (user->getHashMap().at(tid) == NULL){
+    if (user->getHashMap().find(tid) == user->getHashMap().end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
@@ -262,7 +262,17 @@ int uthread_resume(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_sync(int tid){
+    if ((user->getLinkedList()->front() == 0) ||(user->getHashMap().find(tid) == user->getHashMap
+            ().end())){
+        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        return -1;
+    }
+    user->getHashMap().at(tid)->addThreadToSyncList(user->getLinkedList()->front());
     saveCurThread();
+    deleteSyncList(user->getLinkedList()->front());
+    user->getHashMap().at(user->getLinkedList()->front())->setState(2);
+    runNextThread();
+    return 0;
 
 }
 
