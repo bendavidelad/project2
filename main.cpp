@@ -41,9 +41,7 @@ int main(int argc, char const *argv[])
     hashMap.insert(shopping);
     hashMap.insert(shopping1);
     cout << hashMap.at(3) << endl;
-<<<<<<< HEAD
     cout << hashMap.erase(6) << endl;
-=======
 //    cout << hashMap.at(4) << endl;
     try {
 
@@ -55,6 +53,5 @@ int main(int argc, char const *argv[])
 
 
 //    uthread_init(986);
->>>>>>> 8a75c9b4e443b20fa233fcc6b175b3b42adff975
 
     }

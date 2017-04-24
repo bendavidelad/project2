@@ -1,14 +1,14 @@
-<<<<<<< HEAD
 #include <setjmp.h>
 #include <stdlib.h>
 #include "uthreads.h"
 #include <cstdlib>
-=======
 #include "uthreads.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
->>>>>>> 8a75c9b4e443b20fa233fcc6b175b3b42adff975
+#include <stdlib.h>
+#include <stdio.h>      /* printf, fopen */
+#include <stdlib.h>     /*
 
 
 /*
@@ -131,17 +131,23 @@ int uthread_spawn(void (*f)(void)){
 */
 int uthread_terminate(int tid){
     if (tid == 0){
-        // TODO delete(&user);
-        exit(0);
-    }
-    if (user.getHashMap().erase(tid) == 0){
+        delete(user);
+        exit(0); //TODO
+     }
+    if (user->getHashMap().erase(tid) == 0){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    user.getLinkedList()->remove(tid);
-    user.getMinHeap().push(tid);
-
-
+    user->getMinHeap().push(tid);
+    if (user->getLinkedList()->front() == tid){
+        user->getLinkedList()->pop_front();
+        shared_ptr<Thread> newRunningThread = user->getHashMap().at(user->getLinkedList()->front());
+        newRunningThread->setState(1);
+        runNextThread();
+        newRunningThread->getFunction()(); // run the new thread
+    } else {
+        user->getLinkedList()->remove(tid);
+    }
 }
 
 
@@ -155,7 +161,21 @@ int uthread_terminate(int tid){
  * effect and is not considered as an error.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_block(int tid);
+int uthread_block(int tid){
+    if ((tid == 0) || (user->getHashMap().find(tid) == 0)){
+        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        return -1;
+    }
+    if (user->getHashMap().at(tid)->getState() == 1){
+        
+    } else if (user->getHashMap().at(tid)->getState() == 0){
+        user->getLinkedList()->remove(tid);
+        user->getHashMap().at(tid)->setState(2);
+    } else if (user->getHashMap().at(tid)->getState() == 2){
+        return 0;
+    }
+
+}
 
 
 /*
