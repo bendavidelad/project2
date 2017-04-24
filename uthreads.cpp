@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 #include <setjmp.h>
 #include <stdlib.h>
 #include "uthreads.h"
 #include <cstdlib>
+=======
+#include "uthreads.h"
+#include <stdio.h>
+#include <signal.h>
+#include <sys/time.h>
+>>>>>>> 8a75c9b4e443b20fa233fcc6b175b3b42adff975
 
 
 /*
@@ -15,13 +22,22 @@
 #include "UserLevelManager.h"
 using namespace std;
 
-UserLevelManager user;
-
+UserLevelManager* user;
 
 void makeThreadReady(int tid){
-    user.getHashMap().at(tid)->setState(READY);
-    user.getLinkedList()->push_back(tid);
+    user->getHashMap().at(tid)->setState(READY);
+    user->getLinkedList()->push_back(tid);
 }
+
+/**
+ *
+ * @param sig
+ */
+void timer_handler(int sig)
+{
+//    gotit = 1;
+    printf("Timer expired\n");
+}//TODO need to handle the time threw this function
 
 
 /*
@@ -32,20 +48,41 @@ void makeThreadReady(int tid){
  * function with non-positive quantum_usecs.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_init(unsigned int quantum_usecs) {
-
+int uthread_init(int quantum_usecs) {
+    struct sigaction sa;
+    struct itimerval timer;
+    //check if the args is valid
     if (quantum_usecs <= 0 ){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    try {
+    // Install timer_handler as the signal handler for SIGVTALRM.
+    sa.sa_handler = &timer_handler;
+    if (sigaction(SIGVTALRM, &sa,NULL) < 0) {
+        printf("sigaction error.");
+    }
+    // Configure the timer to expire after 1 sec... */
+    timer.it_value.tv_sec = 0;		// first time interval, seconds part
+    timer.it_value.tv_usec = 0;		// first time interval, seconds part
 
-        user = UserLevelManager(quantum_usecs);
-    } catch (const std::bad_alloc &e) {
+    // configure the timer to expire every 3 sec after that.
+    timer.it_interval.tv_sec = 0;	// following time intervals, seconds part
+    timer.it_interval.tv_usec = (unsigned int)quantum_usecs;	// fo
+
+    try {
+        user =  new UserLevelManager((unsigned int)quantum_usecs);
+    }
+    catch (const std::bad_alloc &e) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
-    //uthread_spawn(siglongjmp())
+//     Install timer_handler as the signal handler for SIGVTALRM.
+    sa.sa_handler = &timer_handler;
+    if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
+        printf("setitimer error.");
+    }
+
+//    uthread_spawn(siglongjmp())
     return 0;
 }
 
@@ -61,21 +98,21 @@ int uthread_init(unsigned int quantum_usecs) {
  * On failure, return -1.
 */
 int uthread_spawn(void (*f)(void)){
-    if(user.getHashMap().size() == user.getMaxthreadNum()){
+    if(user->getHashMap().size() == user->getMaxthreadNum()){
         return  -1;
     }
     std::shared_ptr<Thread> thread(new Thread(f));
     int tid;
-    if(user.getMinHeap().empty()){
-        tid = user.getThreadCounter();
-        user.addThreadCounter();
+    if(user->getMinHeap().empty()){
+        tid = user->getThreadCounter();
+        user->addThreadCounter();
     } else{
-        tid = user.getMinHeap().top();
-        user.getMinHeap().pop();
+        tid = user->getMinHeap().top();
+        user->getMinHeap().pop();
     }
     thread->setId(tid);
     std::pair<int , shared_ptr<Thread>> newThread(tid , thread);
-    user.getHashMap().insert(newThread);
+    user->getHashMap().insert(newThread);
     makeThreadReady(tid);
     return tid;
 }
@@ -93,18 +130,6 @@ int uthread_spawn(void (*f)(void)){
  * thread is terminated, the function does not return.
 */
 int uthread_terminate(int tid){
-    if (tid == 0){
-        // TODO delete(&user);
-        exit(0);
-    }
-    if (user.getHashMap().erase(tid) == 0){
-        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
-        return -1;
-    }
-    user.getLinkedList()->remove(tid);
-    user.getMinHeap().push(tid);
-
-
 }
 
 
@@ -162,7 +187,7 @@ int uthread_get_tid();
  * Return value: The total number of quantums.
 */
 int uthread_get_total_quantums(){
-    return user.getQuantumNum();
+    return user->getQuantumNum();
 }
 
 
@@ -176,10 +201,10 @@ int uthread_get_total_quantums(){
  * Return value: On success, return the number of quantums of the thread with ID tid. On failure, return -1.
 */
 int uthread_get_quantums(int tid){
-    if (user.getHashMap().find(tid) == user.getHashMap().end()){
+    if (user->getHashMap().find(tid) == user->getHashMap().end()){
         return -1;
     } else{
-        return user.getHashMap().at(tid)->getQuantums();
+        return user->getHashMap().at(tid)->getQuantums();
     }
 }
 

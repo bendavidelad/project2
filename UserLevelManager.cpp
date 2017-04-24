@@ -15,7 +15,7 @@ minHeap UserLevelManager::getMinHeap() {
     return *minHeapDeletedThreads;
 }
 
-list<int> *UserLevelManager::getLinkedList() {
+list<int>* UserLevelManager::getLinkedList() {
     return nullptr;
 }
 
