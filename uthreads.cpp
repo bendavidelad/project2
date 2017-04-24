@@ -192,7 +192,7 @@ int uthread_terminate(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_block(int tid){
-    if ((tid == 0) || (user->getHashMap().find(tid) == 0)){
+    if ((tid == 0) || (user->getHashMap().at(tid) == NULL)){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
@@ -201,9 +201,8 @@ int uthread_block(int tid){
     } else if (user->getHashMap().at(tid)->getState() == 0){
         user->getLinkedList()->remove(tid);
         user->getHashMap().at(tid)->setState(2);
-    } else if (user->getHashMap().at(tid)->getState() == 2){
-        return 0;
     }
+    return 0;
 
 }
 
