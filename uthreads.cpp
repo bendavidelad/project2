@@ -20,7 +20,7 @@ using namespace std;
 //the time structs
 struct sigaction sa;
 struct itimerval timer;
-int programQuantum_usecs;
+int programQuantumUsecs;
 //the handler user manager instant
 UserLevelManager* user;
 //the thread state array
@@ -79,11 +79,11 @@ void timeBoot(){
     }
     // Configure the timer to expire after 1 sec... */
     timer.it_value.tv_sec = 0;		// first time interval, seconds part
-    timer.it_value.tv_usec = (unsigned int)quantum_usecs;		// first time interval, seconds part
+    timer.it_value.tv_usec = (unsigned int)programQuantumUsecs;		// first time interval, seconds part
 
     // configure the timer to expire every 3 sec after that.
     timer.it_interval.tv_sec = 0;	// following time intervals, seconds part
-    timer.it_interval.tv_usec = (unsigned int)quantum_usecs;	// fo
+    timer.it_interval.tv_usec = (unsigned int)programQuantumUsecs;	// fo
     if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
         printf("setitimer error.");
     }
@@ -107,7 +107,7 @@ int uthread_init(int quantum_usecs) {
     }
 
     // Install timer_handler as the signal handler for SIGVTALRM.
-    programQuantum_usecs = quantum_usecs;
+    programQuantumUsecs = quantum_usecs;
     sa.sa_handler = &timer_handler;
 
     try {
@@ -183,6 +183,7 @@ int uthread_terminate(int tid){
         newRunningThread->setState(1);
         runNextThread();
         newRunningThread->getFunction()(); // run the new thread
+        timeBoot();
     } else {
         user->getLinkedList()->remove(tid);
     }
@@ -209,6 +210,7 @@ int uthread_block(int tid){
         saveCurThread();
         user->getHashMap().at(tid)->setState(2);
         runNextThread();
+        timeBoot();
    } else if (user->getHashMap().at(tid)->getState() == 0){
         user->getLinkedList()->remove(tid);
         user->getHashMap().at(tid)->setState(2);
