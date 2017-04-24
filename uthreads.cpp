@@ -43,25 +43,23 @@ void runNextThread(){
     user->getHashMap().at(runningThreadId)->setState(RUNNING);
 }
 
-/**
- *
- * @param sig
- */
-void timer_handler(int sig)
-{
+void saveCurThread(){
     int runningThreadId = user->getLinkedList()->front();
     user->getLinkedList()->pop_front();
     makeThreadReady(runningThreadId);
     user->getHashMap().at(runningThreadId)->upQuantum();
     //save current state **TODO verify
     sigsetjmp(env[runningThreadId],1);
+}
+/**
+ *
+ * @param sig
+ */
+void timer_handler(int sig)
+{
+    saveCurThread();
     runNextThread();
 
-
-
-
-
-    printf("Timer expired\n");
 }//TODO need to handle the time threw this function
 
 
