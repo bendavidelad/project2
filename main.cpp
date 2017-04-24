@@ -3,7 +3,7 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
-
+#include "uthreads.h"
 using namespace std;
 
 struct comparator {
@@ -40,5 +40,15 @@ int main(int argc, char const *argv[])
     hashMap.insert(shopping);
     cout << hashMap.at(3) << endl;
 //    cout << hashMap.at(4) << endl;
+    try {
 
-}
+
+   uthread_init(89);
+    }catch (const std::exception& e){
+        printf("dddd");
+    }
+
+
+//    uthread_init(986);
+
+    }

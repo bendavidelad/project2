@@ -11,7 +11,6 @@ Thread::Thread(void (*func)(void)){
     quantums_num = 0;
     function = func;
     stack = malloc(STACK_SIZE);
-    envBuf = NULL;
 };
 
 int Thread::getState(){
