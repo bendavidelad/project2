@@ -1,20 +1,12 @@
 #include <setjmp.h>
 #include <stdlib.h>
 #include "uthreads.h"
-<<<<<<< HEAD
-=======
 #include <cstdlib>
->>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 #include "uthreads.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
-<<<<<<< HEAD
-=======
 #include <stdlib.h>
-#include <stdio.h>      /* printf, fopen */
-#include <stdlib.h>     /*
->>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 
 
 /*
@@ -39,7 +31,7 @@ void makeThreadReady(int tid){
 
 
 
-void runNextTread(){
+void runNextThread(){
     int runningThreadId = user->getLinkedList()->front();
     //check whither the function runs in the first time and in the if branches it "booted" up
     //else using siglongjmp we continue the run of the tread from the last time
@@ -63,7 +55,7 @@ void timer_handler(int sig)
     user->getHashMap().at(runningThreadId)->upQuantum();
     //save current state **TODO verify
     sigsetjmp(env[runningThreadId],1);
-    runNextTread();
+    runNextThread();
 
 
 
@@ -165,24 +157,20 @@ int uthread_spawn(void (*f)(void)){
 */
 int uthread_terminate(int tid){
     if (tid == 0){
-<<<<<<< HEAD
+
         // TODO delete(&user);
-    }
-=======
+
         delete(user);
         exit(0); //TODO
      }
->>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
     if (user->getHashMap().erase(tid) == 0){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-<<<<<<< HEAD
     user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
 
 
-=======
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
@@ -193,7 +181,6 @@ int uthread_terminate(int tid){
     } else {
         user->getLinkedList()->remove(tid);
     }
->>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 }
 
 
