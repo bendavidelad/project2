@@ -47,3 +47,7 @@ void Thread::setState(int state) {
 void Thread::setEnvBuf (){
     sigsetjmp(envBuf , 0);
 }
+
+void Thread::upQuantum() {
+    quantums_num++;
+}

@@ -36,6 +36,8 @@ public:
 
     int getQuantums();
 
+    void upQuantum();
+
     voidFn getFunction();
 
     void setId(int id);

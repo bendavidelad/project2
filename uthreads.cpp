@@ -1,14 +1,20 @@
 #include <setjmp.h>
 #include <stdlib.h>
 #include "uthreads.h"
+<<<<<<< HEAD
+=======
 #include <cstdlib>
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 #include "uthreads.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
+<<<<<<< HEAD
+=======
 #include <stdlib.h>
 #include <stdio.h>      /* printf, fopen */
 #include <stdlib.h>     /*
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 
 
 /*
@@ -23,10 +29,26 @@
 using namespace std;
 
 UserLevelManager* user;
+sigjmp_buf env[MAX_THREAD_NUM];
+
 
 void makeThreadReady(int tid){
     user->getHashMap().at(tid)->setState(READY);
     user->getLinkedList()->push_back(tid);
+}
+
+
+
+void runNextTread(){
+    int runningThreadId = user->getLinkedList()->front();
+    //check whither the function runs in the first time and in the if branches it "booted" up
+    //else using siglongjmp we continue the run of the tread from the last time
+    if(user->getHashMap().at(runningThreadId)->getQuantums() == 0) {
+        user->getHashMap().at(runningThreadId)->getFunction()();
+    }else{
+        siglongjmp(env[runningThreadId],1);
+    }
+    user->getHashMap().at(runningThreadId)->setState(RUNNING);
 }
 
 /**
@@ -35,7 +57,18 @@ void makeThreadReady(int tid){
  */
 void timer_handler(int sig)
 {
-//    gotit = 1;
+    int runningThreadId = user->getLinkedList()->front();
+    user->getLinkedList()->pop_front();
+    makeThreadReady(runningThreadId);
+    user->getHashMap().at(runningThreadId)->upQuantum();
+    //save current state **TODO verify
+    sigsetjmp(env[runningThreadId],1);
+    runNextTread();
+
+
+
+
+
     printf("Timer expired\n");
 }//TODO need to handle the time threw this function
 
@@ -51,6 +84,7 @@ void timer_handler(int sig)
 int uthread_init(int quantum_usecs) {
     struct sigaction sa;
     struct itimerval timer;
+
     //check if the args is valid
     if (quantum_usecs <= 0 ){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
@@ -131,13 +165,24 @@ int uthread_spawn(void (*f)(void)){
 */
 int uthread_terminate(int tid){
     if (tid == 0){
+<<<<<<< HEAD
+        // TODO delete(&user);
+    }
+=======
         delete(user);
         exit(0); //TODO
      }
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
     if (user->getHashMap().erase(tid) == 0){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
+<<<<<<< HEAD
+    user->getLinkedList()->remove(tid);
+    user->getMinHeap().push(tid);
+
+
+=======
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
@@ -148,6 +193,7 @@ int uthread_terminate(int tid){
     } else {
         user->getLinkedList()->remove(tid);
     }
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 }
 
 
