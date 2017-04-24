@@ -4,6 +4,7 @@
 #define PROJECT2_THREAD_H
 
 #include <setjmp.h>
+#include <list>
 
 static const int READY = 0;
 static const int RUNNING = 1;
@@ -46,6 +47,10 @@ public:
 
     void setEnvBuf ();
 
+    std::list<int> getSyncList(){
+        return *syncList;
+    }
+
 private:
 
     int state;
@@ -54,6 +59,7 @@ private:
     void (*function)(void);
     void* stack;
     sigjmp_buf envBuf;
+    std::list<int> *syncList;
 
 };
 

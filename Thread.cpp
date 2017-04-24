@@ -5,12 +5,14 @@
 #define STACK_SIZE 4096 /* stack size per thread (in bytes) */
 
 static const std::string ERROR_MSG = "system error:";
+using namespace std;
 
 Thread::Thread(void (*func)(void)){
     state = READY;
     quantums_num = 0;
     function = func;
     stack = malloc(STACK_SIZE);
+    syncList = new list<int>();
 };
 
 int Thread::getState(){

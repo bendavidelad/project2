@@ -26,7 +26,7 @@ sigjmp_buf env[MAX_THREAD_NUM];
 
 void makeThreadReady(int tid){
     user->getHashMap().at(tid)->setState(READY);
-    user->getLinkedList()->(tid);
+    user->getLinkedList()->push_back(tid);
 }
 
 
@@ -50,6 +50,12 @@ void saveCurThread(){
     //save current state **TODO verify
     sigsetjmp(env[runningThreadId],1);
 }
+
+void deleteSyncList(int tid){
+    shared_ptr<Thread> currThread = user->getHashMap().at(tid);
+    std::list<int>::const_iterator iterator;
+}
+
 /**
  *
  * @param sig
@@ -157,10 +163,12 @@ int uthread_terminate(int tid){
         delete(user);
         exit(0); //TODO
      }
-    if (user->getHashMap().erase(tid) == 0){
+    if (user->getHashMap().find(tid) == user->getHashMap().end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
+
+    user->getHashMap().erase(tid);
     user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
     user->getMinHeap().push(tid);
@@ -173,6 +181,7 @@ int uthread_terminate(int tid){
     } else {
         user->getLinkedList()->remove(tid);
     }
+    return 0;
 }
 
 
@@ -191,8 +200,7 @@ int uthread_block(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if (user->getHashMap().at(tid)->getState() == 1)
-    {
+    if (user->getHashMap().at(tid)->getState() == 1) {
         saveCurThread();
         user->getHashMap().at(tid)->setState(2);
         runNextThread();
@@ -212,7 +220,19 @@ int uthread_block(int tid){
  * ID tid exists it is considered as an error.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_resume(int tid);
+int uthread_resume(int tid){
+    if (user->getHashMap().at(tid) == NULL){
+        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        return -1;
+    }
+    if ((user->getHashMap().at(tid)->getState() == 0) || (user->getHashMap().at(tid)->getState()
+                                                          == 1)){
+        return 0;
+    } else {
+        makeThreadReady(tid);
+        return 0;
+    }
+}
 
 
 /*
@@ -227,14 +247,18 @@ int uthread_resume(int tid);
  * the BLOCKED state a scheduling decision should be made.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_sync(int tid);
+int uthread_sync(int tid){
+
+}
 
 
 /*
  * Description: This function returns the thread ID of the calling thread.
  * Return value: The ID of the calling thread.
 */
-int uthread_get_tid();
+int uthread_get_tid(){
+    return user->getLinkedList()->front();
+}
 
 
 /*
