@@ -1,14 +1,10 @@
-<<<<<<< HEAD
 #include <setjmp.h>
 #include <stdlib.h>
 #include "uthreads.h"
-#include <cstdlib>
-=======
 #include "uthreads.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
->>>>>>> 8a75c9b4e443b20fa233fcc6b175b3b42adff975
 
 
 /*
@@ -23,10 +19,26 @@
 using namespace std;
 
 UserLevelManager* user;
+sigjmp_buf env[MAX_THREAD_NUM];
+
 
 void makeThreadReady(int tid){
     user->getHashMap().at(tid)->setState(READY);
     user->getLinkedList()->push_back(tid);
+}
+
+
+
+void runNextTread(){
+    int runningThreadId = user->getLinkedList()->front();
+    //check whither the function runs in the first time and in the if branches it "booted" up
+    //else using siglongjmp we continue the run of the tread from the last time
+    if(user->getHashMap().at(runningThreadId)->getQuantums() == 0) {
+        user->getHashMap().at(runningThreadId)->getFunction()();
+    }else{
+        siglongjmp(env[runningThreadId],1);
+    }
+    user->getHashMap().at(runningThreadId)->setState(RUNNING);
 }
 
 /**
@@ -35,7 +47,18 @@ void makeThreadReady(int tid){
  */
 void timer_handler(int sig)
 {
-//    gotit = 1;
+    int runningThreadId = user->getLinkedList()->front();
+    user->getLinkedList()->pop_front();
+    makeThreadReady(runningThreadId);
+    user->getHashMap().at(runningThreadId)->upQuantum();
+    //save current state **TODO verify
+    sigsetjmp(env[runningThreadId],1);
+    runNextTread();
+
+
+
+
+
     printf("Timer expired\n");
 }//TODO need to handle the time threw this function
 
@@ -51,6 +74,7 @@ void timer_handler(int sig)
 int uthread_init(int quantum_usecs) {
     struct sigaction sa;
     struct itimerval timer;
+
     //check if the args is valid
     if (quantum_usecs <= 0 ){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
@@ -132,14 +156,13 @@ int uthread_spawn(void (*f)(void)){
 int uthread_terminate(int tid){
     if (tid == 0){
         // TODO delete(&user);
-        exit(0);
     }
-    if (user.getHashMap().erase(tid) == 0){
+    if (user->getHashMap().erase(tid) == 0){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    user.getLinkedList()->remove(tid);
-    user.getMinHeap().push(tid);
+    user->getLinkedList()->remove(tid);
+    user->getMinHeap().push(tid);
 
 
 }
