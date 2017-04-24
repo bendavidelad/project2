@@ -167,7 +167,7 @@ int uthread_block(int tid){
         return -1;
     }
     if (user->getHashMap().at(tid)->getState() == 1){
-        
+
     } else if (user->getHashMap().at(tid)->getState() == 0){
         user->getLinkedList()->remove(tid);
         user->getHashMap().at(tid)->setState(2);
