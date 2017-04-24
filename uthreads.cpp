@@ -57,7 +57,11 @@ void saveCurThread(){
 
 void deleteSyncList(int tid){
     shared_ptr<Thread> currThread = user->getHashMap().at(tid);
-    std::list<int>::const_iterator iterator;
+    for (auto it = currThread->getSyncList().begin(); it != currThread->getSyncList().end(); ++it){
+        user->getHashMap().at(*it)->setState(READY);
+        user->getLinkedList()->push_back(*it);
+    }
+    currThread->bootSyncList();
 }
 
 /**

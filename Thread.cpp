@@ -40,7 +40,7 @@ void Thread::setId(int id) {
 }
 
 void Thread::setState(int state) {
-    if (state>2 || state < 0 ){
+    if (state > 2 || state < 0 ){
         throw std::invalid_argument(ERROR_MSG + "bad argument");
     }
     this->state = state;
@@ -52,4 +52,8 @@ void Thread::setEnvBuf (){
 
 void Thread::upQuantum() {
     quantums_num++;
+}
+
+void Thread::bootSyncList() {
+    syncList->clear();
 }

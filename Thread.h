@@ -51,6 +51,7 @@ public:
         return *syncList;
     }
 
+    void bootSyncList();
 private:
 
     int state;
