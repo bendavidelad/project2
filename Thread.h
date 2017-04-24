@@ -47,13 +47,9 @@ public:
 
     void setEnvBuf ();
 
-    std::list<int> getSyncList(){
-        return *syncList;
-    }
+    std::list<int> getSyncList();
 
-    void addThreadToSyncList(int tid){
-        
-    }
+    void addThreadToSyncList(int tid);
 
     void bootSyncList();
 private:
