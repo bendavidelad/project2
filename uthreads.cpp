@@ -1,10 +1,20 @@
 #include <setjmp.h>
 #include <stdlib.h>
 #include "uthreads.h"
+<<<<<<< HEAD
+=======
+#include <cstdlib>
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 #include "uthreads.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
+<<<<<<< HEAD
+=======
+#include <stdlib.h>
+#include <stdio.h>      /* printf, fopen */
+#include <stdlib.h>     /*
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 
 
 /*
@@ -155,16 +165,35 @@ int uthread_spawn(void (*f)(void)){
 */
 int uthread_terminate(int tid){
     if (tid == 0){
+<<<<<<< HEAD
         // TODO delete(&user);
     }
+=======
+        delete(user);
+        exit(0); //TODO
+     }
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
     if (user->getHashMap().erase(tid) == 0){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
+<<<<<<< HEAD
     user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
 
 
+=======
+    user->getMinHeap().push(tid);
+    if (user->getLinkedList()->front() == tid){
+        user->getLinkedList()->pop_front();
+        shared_ptr<Thread> newRunningThread = user->getHashMap().at(user->getLinkedList()->front());
+        newRunningThread->setState(1);
+        runNextThread();
+        newRunningThread->getFunction()(); // run the new thread
+    } else {
+        user->getLinkedList()->remove(tid);
+    }
+>>>>>>> 23b9b0901f21bf0fe7ff9ac1ddd069bcdde5a519
 }
 
 
@@ -178,7 +207,21 @@ int uthread_terminate(int tid){
  * effect and is not considered as an error.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_block(int tid);
+int uthread_block(int tid){
+    if ((tid == 0) || (user->getHashMap().find(tid) == 0)){
+        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        return -1;
+    }
+    if (user->getHashMap().at(tid)->getState() == 1){
+        
+    } else if (user->getHashMap().at(tid)->getState() == 0){
+        user->getLinkedList()->remove(tid);
+        user->getHashMap().at(tid)->setState(2);
+    } else if (user->getHashMap().at(tid)->getState() == 2){
+        return 0;
+    }
+
+}
 
 
 /*
