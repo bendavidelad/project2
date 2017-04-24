@@ -11,6 +11,7 @@ Thread::Thread(void (*func)(void)){
     quantums_num = 0;
     function = func;
     stack = malloc(STACK_SIZE);
+    envBuf = NULL;
 };
 
 int Thread::getState(){
@@ -44,3 +45,6 @@ void Thread::setState(int state) {
     this->state = state;
 }
 
+void Thread::setEnvBuf (){
+    sigsetjmp(envBuf , 0);
+}

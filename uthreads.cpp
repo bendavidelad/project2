@@ -31,7 +31,13 @@ void makeThreadReady(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_init(unsigned int quantum_usecs) {
+
+    if (quantum_usecs <= 0 ){
+        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        return -1;
+    }
     try {
+
         user = UserLevelManager(quantum_usecs);
     } catch (const std::bad_alloc &e) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;

@@ -5,7 +5,7 @@ using namespace std;
 UserLevelManager::UserLevelManager(unsigned int quantum_usecs) {
     numOfQuantum = 0;
     threadCounter = 0;
-    maxThredsNum = MAX_THREAD_NUM;
+    maxThreadsNum = MAX_THREAD_NUM;
     quantomUsecs = quantum_usecs;
     hashMap = new unordered_map<int, shared_ptr<Thread>>;
     linkedList = new list<int>;
@@ -52,7 +52,7 @@ UserLevelManager::~UserLevelManager() {
 UserLevelManager &UserLevelManager::operator=(const UserLevelManager &other) {
     this->hashMap = other.hashMap;
     this->linkedList = other.linkedList;
-    this->maxThredsNum = other.maxThredsNum;
+    this->maxThreadsNum = other.maxThreadsNum;
     this->minHeapDeletedThreads = other.minHeapDeletedThreads;
     this->numOfQuantum = other.numOfQuantum;
     return *this;
@@ -67,6 +67,6 @@ void UserLevelManager::addThreadCounter() {
 }
 
 int UserLevelManager::getMaxthreadNum() {
-    return maxThredsNum;
+    return maxThreadsNum;
 }
 

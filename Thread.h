@@ -3,6 +3,8 @@
 #ifndef PROJECT2_THREAD_H
 #define PROJECT2_THREAD_H
 
+#include <setjmp.h>
+
 static const int READY = 0;
 static const int RUNNING = 1;
 static const int BLOCKED = 2;
@@ -40,6 +42,8 @@ public:
 
     void setState(int state);
 
+    void setEnvBuf ();
+
 private:
 
     int state;
@@ -47,6 +51,7 @@ private:
     int quantums_num;
     void (*function)(void);
     void* stack;
+    sigjmp_buf envBuf;
 
 };
 

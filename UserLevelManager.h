@@ -16,7 +16,8 @@
 //typedef std::vector<std::shared_ptr<int>> threadPtrPrVec;
 
 static const std::string ERROR_MSG = "system error:";
-static const std::string BAD_ALLOC_MSG = "bad allocation occur";
+static const std::string BAD_ARG_MSG = "bad arg occurred";
+static const std::string BAD_ALLOC_MSG = "bad allocation occurred";
 struct comparator {
     bool operator()(int i, int j) {
         return i > j;
@@ -103,7 +104,7 @@ private:
     //contains all the threads
     std::unordered_map<int ,std::shared_ptr<Thread>> *hashMap;
     int numOfQuantum;
-    int maxThredsNum;
+    int maxThreadsNum;
     unsigned int threadCounter;
     unsigned int quantomUsecs;
 
