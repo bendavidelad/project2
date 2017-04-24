@@ -90,7 +90,8 @@ int uthread_spawn(void (*f)(void)){
  * terminated and -1 otherwise. If a thread terminates itself or the main
  * thread is terminated, the function does not return.
 */
-int uthread_terminate(int tid);
+int uthread_terminate(int tid){
+}
 
 
 /*
