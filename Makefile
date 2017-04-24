@@ -23,7 +23,7 @@ $(TARGETS): $(LIBOBJ)
 	$(RANLIB) $@
 
 clean:
-	$(RM) $(TARGETS) $(OSMLIB) $(OBJ) $(LIBOBJ) *~ *core
+	rm -rf *.o *.a ex2.tar
 
 depend:
 	makedepend -- $(CFLAGS) -- $(SRC) $(LIBSRC)
