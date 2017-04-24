@@ -159,9 +159,6 @@ int uthread_spawn(void (*f)(void)){
 */
 int uthread_terminate(int tid){
     if (tid == 0){
-
-        // TODO delete(&user);
-
         delete(user);
         exit(0); //TODO
      }
@@ -171,8 +168,6 @@ int uthread_terminate(int tid){
     }
     user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
-
-
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
@@ -201,9 +196,12 @@ int uthread_block(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if (user->getHashMap().at(tid)->getState() == 1){
-        
-    } else if (user->getHashMap().at(tid)->getState() == 0){
+    if (user->getHashMap().at(tid)->getState() == 1)
+    {
+        saveCurThread();
+        user->getHashMap().at(tid)->setState(2);
+        runNextThread();
+   } else if (user->getHashMap().at(tid)->getState() == 0){
         user->getLinkedList()->remove(tid);
         user->getHashMap().at(tid)->setState(2);
     }
