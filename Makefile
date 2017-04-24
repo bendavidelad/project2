@@ -1,20 +1,20 @@
 CC=g++ -std=c++11
 RANLIB=ranlib
 
-LIBSRC= osm.cpp
+LIBSRC= Thread.cpp Thread.h UserLevelManager.cpp UserLevelManager.h uthreads.cpp uthreads.h
 LIBOBJ= $(LIBSRC:.cpp=.o)
 
 INCS=-I.
 CFLAGS = -Wall -g $(INCS)
 LOADLIBES = -L./ 
 
-OSMLIB = libosm.a
+OSMLIB = libuthreads.a
 TARGETS = $(OSMLIB)
 
 TAR=tar
 TARFLAGS=-cvf
-TARNAME=ex1.tar
-TARSRCS=$(LIBSRC) Makefile README
+TARNAME=ex2.tar
+TARSRCS= Makefile README Thread.cpp Thread.h UserLevelManager.cpp UserLevelManager.h uthreads.cpp 
 
 all: $(TARGETS) 
 
