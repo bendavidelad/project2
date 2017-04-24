@@ -49,7 +49,13 @@ public:
 
     std::list<int> getSyncList();
 
+<<<<<<< HEAD
+    void addThreadToSyncList(int tid){
+
+    }
+=======
     void addThreadToSyncList(int tid);
+>>>>>>> 109319fcd29a8548d3fbf6cf92621f47b838ba64
 
     void bootSyncList();
 private:
