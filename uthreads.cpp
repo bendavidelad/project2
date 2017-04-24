@@ -26,7 +26,7 @@ sigjmp_buf env[MAX_THREAD_NUM];
 
 void makeThreadReady(int tid){
     user->getHashMap().at(tid)->setState(READY);
-    user->getLinkedList()->push_back(tid);
+    user->getLinkedList()->(tid);
 }
 
 
@@ -41,13 +41,12 @@ void runNextThread(){
         siglongjmp(env[runningThreadId],1);
     }
     user->getHashMap().at(runningThreadId)->setState(RUNNING);
+    user->getHashMap().at(runningThreadId)->upQuantum();
 }
 
 void saveCurThread(){
     int runningThreadId = user->getLinkedList()->front();
     user->getLinkedList()->pop_front();
-    makeThreadReady(runningThreadId);
-    user->getHashMap().at(runningThreadId)->upQuantum();
     //save current state **TODO verify
     sigsetjmp(env[runningThreadId],1);
 }
@@ -57,7 +56,9 @@ void saveCurThread(){
  */
 void timer_handler(int sig)
 {
+    int runningThreadId = user->getLinkedList()->front();
     saveCurThread();
+    makeThreadReady(runningThreadId);
     runNextThread();
 
 }//TODO need to handle the time threw this function
@@ -100,8 +101,6 @@ int uthread_init(int quantum_usecs) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
-//     Install timer_handler as the signal handler for SIGVTALRM.
-    sa.sa_handler = &timer_handler;
     if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
         printf("setitimer error.");
     }
