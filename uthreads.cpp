@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include "uthreads.h"
 #include <cstdlib>
-#include "uthreads.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
-#include <stdlib.h>
 
+#include "UserLevelManager.h"
 
 /*
  * User-Level Threads Library (uthreads)
@@ -17,10 +16,14 @@
 
 /* External interface */
 
-#include "UserLevelManager.h"
 using namespace std;
-
+//the time structs
+struct sigaction sa;
+struct itimerval timer;
+int programQuantum_usecs;
+//the handler user manager instant
 UserLevelManager* user;
+//the thread state array
 sigjmp_buf env[MAX_THREAD_NUM];
 
 
@@ -42,6 +45,7 @@ void runNextThread(){
     }
     user->getHashMap().at(runningThreadId)->setState(RUNNING);
     user->getHashMap().at(runningThreadId)->upQuantum();
+    user->addQuantumNum();
 }
 
 void saveCurThread(){
@@ -61,8 +65,24 @@ void timer_handler(int sig)
     makeThreadReady(runningThreadId);
     runNextThread();
 
-}//TODO need to handle the time threw this function
+}
 
+void timeBoot(){
+    if (sigaction(SIGVTALRM, &sa,NULL) < 0) {
+        printf("sigaction error.");
+    }
+    // Configure the timer to expire after 1 sec... */
+    timer.it_value.tv_sec = 0;		// first time interval, seconds part
+    timer.it_value.tv_usec = (unsigned int)quantum_usecs;		// first time interval, seconds part
+
+    // configure the timer to expire every 3 sec after that.
+    timer.it_interval.tv_sec = 0;	// following time intervals, seconds part
+    timer.it_interval.tv_usec = (unsigned int)quantum_usecs;	// fo
+    if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
+        printf("setitimer error.");
+    }
+
+}
 
 /*
  * Description: This function initializes the thread library.
@@ -73,26 +93,16 @@ void timer_handler(int sig)
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_init(int quantum_usecs) {
-    struct sigaction sa;
-    struct itimerval timer;
 
     //check if the args is valid
     if (quantum_usecs <= 0 ){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    // Install timer_handler as the signal handler for SIGVTALRM.
-    sa.sa_handler = &timer_handler;
-    if (sigaction(SIGVTALRM, &sa,NULL) < 0) {
-        printf("sigaction error.");
-    }
-    // Configure the timer to expire after 1 sec... */
-    timer.it_value.tv_sec = 0;		// first time interval, seconds part
-    timer.it_value.tv_usec = 0;		// first time interval, seconds part
 
-    // configure the timer to expire every 3 sec after that.
-    timer.it_interval.tv_sec = 0;	// following time intervals, seconds part
-    timer.it_interval.tv_usec = (unsigned int)quantum_usecs;	// fo
+    // Install timer_handler as the signal handler for SIGVTALRM.
+    programQuantum_usecs = quantum_usecs;
+    sa.sa_handler = &timer_handler;
 
     try {
         user =  new UserLevelManager((unsigned int)quantum_usecs);
@@ -101,11 +111,6 @@ int uthread_init(int quantum_usecs) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
-    if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
-        printf("setitimer error.");
-    }
-
-//    uthread_spawn(siglongjmp())
     return 0;
 }
 
