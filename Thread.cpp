@@ -57,3 +57,23 @@ void Thread::upQuantum() {
 void Thread::bootSyncList() {
     syncList->clear();
 }
+
+std::list<int> Thread::getSyncList() {
+    return *syncList;
+}
+
+void Thread::addThreadToSyncList(int tid) {
+    bool exist = false;
+    for (auto it = syncList->begin(); it != syncList->end(); ++it) {
+        if (*it == tid) {
+            exist = true;
+            break;
+        }
+    }
+        if (exist){
+            return;
+        } else{
+            syncList->push_back(tid);
+    }
+
+}
