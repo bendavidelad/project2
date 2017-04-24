@@ -1,5 +1,7 @@
 #include <setjmp.h>
+#include <stdlib.h>
 #include "uthreads.h"
+#include <cstdlib>
 
 
 /*
@@ -91,7 +93,20 @@ int uthread_spawn(void (*f)(void)){
  * thread is terminated, the function does not return.
 */
 int uthread_terminate(int tid){
+    if (tid == 0){
+        // TODO delete(&user);
+        exit(0);
+    }
+    if (user.getHashMap().erase(tid) == 0){
+        cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        return -1;
+    }
+    user.getLinkedList()->remove(tid);
+    user.getMinHeap().push(tid);
+
+
 }
+
 
 
 /*
