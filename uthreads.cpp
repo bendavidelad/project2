@@ -63,8 +63,7 @@ void deleteSyncList(int tid){
         return;
     }
     std::list<int>::const_iterator it;
-    for (it = currThread->getSyncList().begin(); it != currThread->getSyncList().end();
-         ++it){
+    for (it = currThread->getSyncList().begin(); it != currThread->getSyncList().end(); ++it){
         makeThreadReady(*it);
         user->getLinkedList()->push_back(*it);
     }
@@ -77,12 +76,11 @@ void deleteSyncList(int tid){
  */
 void timer_handler(int sig)
 {
-    cout << "TIMER HANDLER" << endl;
     int runningThreadId = user->getLinkedList()->front();
     saveCurThread();
     deleteSyncList(runningThreadId);
-//    makeThreadReady(runningThreadId);
-//    runNextThread();
+    makeThreadReady(runningThreadId);
+    runNextThread();
 
 }
 
