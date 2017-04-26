@@ -122,6 +122,7 @@ int uthread_init(int quantum_usecs) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
+<<<<<<< HEAD
     //init to the main thread
     std::shared_ptr<Thread> thread(new Thread());
     int tid = 0;
@@ -130,6 +131,8 @@ int uthread_init(int quantum_usecs) {
     std::pair<int , shared_ptr<Thread>> newThread(tid , thread);
     user->getHashMap().insert(newThread);
     makeThreadReady(tid);
+=======
+>>>>>>> a92f4a6536b3698169a2b40e7fafd85453e22d0e
 
     return 0;
 }
@@ -189,7 +192,6 @@ int uthread_terminate(int tid){
     deleteSyncList(tid);
     user->getHashMap().erase(tid);
     user->getLinkedList()->remove(tid);
-    user->getMinHeap().push(tid);
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
