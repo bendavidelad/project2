@@ -181,7 +181,7 @@ int uthread_spawn(void (*f)(void)){
     std::pair<int , shared_ptr<Thread>> newThread(tid, thread);
 
 
-    address_t sp = (address_t)*(thread->getStack()) + STACK_SIZE - sizeof(address_t);
+    address_t sp = (address_t)(thread->getStack()) + STACK_SIZE - sizeof(address_t);
     address_t pc = (address_t)f;
     sigsetjmp(env[tid], 1);
     (env[tid]->__jmpbuf)[JB_SP] = translate_address(sp);
@@ -190,7 +190,7 @@ int uthread_spawn(void (*f)(void)){
 
 
     (*user->getHashMap()).insert(newThread);
-    makeThreadReady(0);
+    makeThreadReady(tid);
     return tid;
 }
 
