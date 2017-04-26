@@ -3,7 +3,9 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
-#include "uthreads.h"
+#include <memory>
+#include "Thread.h"
+
 using namespace std;
 
 struct comparator {
@@ -35,23 +37,18 @@ int main(int argc, char const *argv[])
     cout <<linkedList.front() << endl;
 
 
-    std::unordered_map<int , int> hashMap;
-    std:pair<int,int> shopping(3,4);
-    pair<int,int> shopping1(5,4);
+    std::unordered_map<int , shared_ptr<Thread>> hashMap;
+//    std::shared_ptr<Thread> thread(new Thread(NULL));
+//    cout << *thread << endl;
+    std:pair<int, shared_ptr<Thread>> shopping(3, NULL);
+//    pair<int,int> shopping1(5,4);
+    cout << hashMap.size() << endl;
     hashMap.insert(shopping);
-    hashMap.insert(shopping1);
-    cout << hashMap.at(3) << endl;
-    cout << hashMap.erase(6) << endl;
+    cout << hashMap.size() << endl;
+//    hashMap.insert(shopping1);
+//    cout << *hashMap.at(3) << endl;
+//    cout << hashMap.at(3) << endl;
 //    cout << hashMap.at(4) << endl;
-    try {
-
-
-   uthread_init(89);
-    }catch (const std::exception& e){
-        printf("dddd");
-    }
-
-
-//    uthread_init(986);
+//    cout << hashMap.erase(6) << endl;
 
     }

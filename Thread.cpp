@@ -15,14 +15,6 @@ Thread::Thread(void (*func)(void)){
     syncList = new list<int>();
 };
 
-Thread::Thread() {
-    state = READY;
-    quantums_num = 0;
-    function = NULL;
-    stack = malloc(STACK_SIZE);
-    syncList = new list<int>();
-}
-
 int Thread::getState(){
     return state;
 }

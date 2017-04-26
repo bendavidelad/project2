@@ -75,7 +75,7 @@ public:
      *
      * @return
      */
-    std::unordered_map<int, std::shared_ptr<Thread>> getHashMap();
+    std::shared_ptr<std::unordered_map<int, std::shared_ptr<Thread>>> getHashMap();
     /**
      *
      */
@@ -102,7 +102,7 @@ private:
     //contains the ready states threads
     std::list<int> *linkedList;
     //contains all the threads
-    std::unordered_map<int ,std::shared_ptr<Thread>> *hashMap;
+    std::shared_ptr<std::unordered_map<int,std::shared_ptr<Thread>>> hashMap;
     int numOfQuantum;
     int maxThreadsNum;
     unsigned int threadCounter;

@@ -27,23 +27,27 @@ sigjmp_buf env[MAX_THREAD_NUM];
 
 
 void makeThreadReady(int tid){
-    user->getHashMap().at(tid)->setState(READY);
+    user->getHashMap()->at(tid)->setState(READY);
     user->getLinkedList()->push_back(tid);
 }
 
 
 
 void runNextThread(){
+    user->addQuantumNum();
     int runningThreadId = user->getLinkedList()->front();
+    if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
+        return;
+    }
     //check whither the function runs in the first time and in the if branches it "booted" up
     //else using siglongjmp we continue the run of the tread from the last time
-    if(user->getHashMap().at(runningThreadId)->getQuantums() == 0) {
-        user->getHashMap().at(runningThreadId)->getFunction()();
+    if(user->getHashMap()->at(runningThreadId)->getQuantums() == 0) {
+        user->getHashMap()->at(runningThreadId)->getFunction()();
     }else{
         siglongjmp(env[runningThreadId],1);
     }
-    user->getHashMap().at(runningThreadId)->setState(RUNNING);
-    user->getHashMap().at(runningThreadId)->upQuantum();
+    user->getHashMap()->at(runningThreadId)->setState(RUNNING);
+    user->getHashMap()->at(runningThreadId)->upQuantum();
     user->addQuantumNum();
 }
 
@@ -55,9 +59,9 @@ void saveCurThread(){
 }
 
 void deleteSyncList(int tid){
-    shared_ptr<Thread> currThread = user->getHashMap().at(tid);
+    shared_ptr<Thread> currThread = user->getHashMap()->at(tid);
     for (auto it = currThread->getSyncList().begin(); it != currThread->getSyncList().end(); ++it){
-        user->getHashMap().at(*it)->setState(READY);
+        user->getHashMap()->at(*it)->setState(READY);
         user->getLinkedList()->push_back(*it);
     }
     currThread->bootSyncList();
@@ -122,13 +126,8 @@ int uthread_init(int quantum_usecs) {
         return -1;
     }
     //init to the main thread
-    std::shared_ptr<Thread> thread(new Thread());
-    int tid = 0;
-    user->addThreadCounter();
-    thread->setId(tid);
-    std::pair<int , shared_ptr<Thread>> newThread(tid , thread);
-    user->getHashMap().insert(newThread);
-    makeThreadReady(tid);
+    uthread_spawn(NULL);
+    runNextThread();
     return 0;
 }
 
@@ -144,23 +143,23 @@ int uthread_init(int quantum_usecs) {
  * On failure, return -1.
 */
 int uthread_spawn(void (*f)(void)){
-    if(user->getHashMap().size() == user->getMaxthreadNum()){
+    if(user->getHashMap()->size() == user->getMaxthreadNum()){
         return  -1;
     }
     std::shared_ptr<Thread> thread(new Thread(f));
     int tid;
     if(user->getMinHeap().empty()){
         tid = user->getThreadCounter();
-        user->addThreadCounter();
     } else{
         tid = user->getMinHeap().top();
         user->getMinHeap().pop();
     }
+    user->addThreadCounter();
     thread->setId(tid);
-    std::pair<int , shared_ptr<Thread>> newThread(tid , thread);
-    user->getHashMap().insert(newThread);
-    makeThreadReady(tid);
-    return tid;
+    std::pair<int , shared_ptr<Thread>> newThread(tid, thread);
+    (*user->getHashMap()).insert(newThread);
+    makeThreadReady(0);
+    return 0;
 }
 
 
@@ -180,17 +179,17 @@ int uthread_terminate(int tid){
         delete(user);
         exit(0); //TODO
      }
-    if (user->getHashMap().find(tid) == user->getHashMap().end()){
+    if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
     deleteSyncList(tid);
-    user->getHashMap().erase(tid);
+    user->getHashMap()->erase(tid);
     user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
-        shared_ptr<Thread> newRunningThread = user->getHashMap().at(user->getLinkedList()->front());
+        shared_ptr<Thread> newRunningThread = user->getHashMap()->at(user->getLinkedList()->front());
         newRunningThread->setState(1);
         runNextThread();
         newRunningThread->getFunction()(); // run the new thread
@@ -214,19 +213,19 @@ int uthread_terminate(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_block(int tid){
-    if ((tid == 0) || (user->getHashMap().find(tid) == user->getHashMap().end())){
+    if ((tid == 0) || (user->getHashMap()->find(tid) == user->getHashMap()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if (user->getHashMap().at(tid)->getState() == 1) {
+    if (user->getHashMap()->at(tid)->getState() == 1) {
         saveCurThread();
-        user->getHashMap().at(tid)->setState(2);
+        user->getHashMap()->at(tid)->setState(2);
         runNextThread();
         deleteSyncList(tid);
         timeBoot();
-   } else if (user->getHashMap().at(tid)->getState() == 0){
+   } else if (user->getHashMap()->at(tid)->getState() == 0){
         user->getLinkedList()->remove(tid);
-        user->getHashMap().at(tid)->setState(2);
+        user->getHashMap()->at(tid)->setState(2);
     }
     return 0;
 
@@ -241,11 +240,11 @@ int uthread_block(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_resume(int tid){
-    if (user->getHashMap().find(tid) == user->getHashMap().end()){
+    if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if ((user->getHashMap().at(tid)->getState() == 0) || (user->getHashMap().at(tid)->getState()
+    if ((user->getHashMap()->at(tid)->getState() == 0) || (user->getHashMap()->at(tid)->getState()
                                                           == 1)){
         return 0;
     } else {
@@ -268,15 +267,15 @@ int uthread_resume(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_sync(int tid){
-    if ((user->getLinkedList()->front() == 0) ||(user->getHashMap().find(tid) == user->getHashMap
-            ().end())){
+    if ((user->getLinkedList()->front() == 0) ||(user->getHashMap()->find(tid) == user->getHashMap
+            ()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    user->getHashMap().at(tid)->addThreadToSyncList(user->getLinkedList()->front());
+    user->getHashMap()->at(tid)->addThreadToSyncList(user->getLinkedList()->front());
     saveCurThread();
     deleteSyncList(user->getLinkedList()->front());
-    user->getHashMap().at(user->getLinkedList()->front())->setState(2);
+    user->getHashMap()->at(user->getLinkedList()->front())->setState(2);
     runNextThread();
     return 0;
 
@@ -315,10 +314,10 @@ int uthread_get_total_quantums(){
  * Return value: On success, return the number of quantums of the thread with ID tid. On failure, return -1.
 */
 int uthread_get_quantums(int tid){
-    if (user->getHashMap().find(tid) == user->getHashMap().end()){
+    if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         return -1;
     } else{
-        return user->getHashMap().at(tid)->getQuantums();
+        return user->getHashMap()->at(tid)->getQuantums();
     }
 }
 

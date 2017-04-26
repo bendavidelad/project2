@@ -2,12 +2,12 @@
 
 
 using namespace std;
-UserLevelManager::UserLevelManager(unsigned int quantum_usecs) {
+UserLevelManager::UserLevelManager(unsigned int quantum_usecs) : hashMap(new std::unordered_map<int , std::shared_ptr<Thread>>)
+{
     numOfQuantum = 0;
     threadCounter = 0;
     maxThreadsNum = MAX_THREAD_NUM;
     quantomUsecs = quantum_usecs;
-    hashMap = new unordered_map<int, shared_ptr<Thread>>;
     linkedList = new list<int>;
     minHeapDeletedThreads = new priority_queue<int, vector<int>, comparator>;
 }
@@ -16,11 +16,11 @@ minHeap UserLevelManager::getMinHeap() {
 }
 
 list<int>* UserLevelManager::getLinkedList() {
-    return nullptr;
+    return linkedList;
 }
 
-unordered_map<int, shared_ptr<Thread>> UserLevelManager::getHashMap() {
-    return *hashMap;
+std::shared_ptr<std::unordered_map<int, std::shared_ptr<Thread>>> UserLevelManager::getHashMap() {
+    return hashMap;
 }
 
 void UserLevelManager::addQuantumNum() {
@@ -44,7 +44,6 @@ UserLevelManager::UserLevelManager(const UserLevelManager &user) {
 }
 
 UserLevelManager::~UserLevelManager() {
-    delete this->hashMap;
     delete this->linkedList;
     delete this->minHeapDeletedThreads;
 }
