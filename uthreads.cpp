@@ -36,6 +36,7 @@ void makeThreadReady(int tid){
 void runNextThread(){
     user->addQuantumNum();
     int runningThreadId = user->getLinkedList()->front();
+    user->getHashMap()->at(runningThreadId)->upQuantum();
     if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
         return;
     }
