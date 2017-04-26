@@ -122,6 +122,15 @@ int uthread_init(int quantum_usecs) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
+    //init to the main thread
+    std::shared_ptr<Thread> thread(new Thread());
+    int tid = 0;
+    user->addThreadCounter();
+    thread->setId(tid);
+    std::pair<int , shared_ptr<Thread>> newThread(tid , thread);
+    user->getHashMap().insert(newThread);
+    makeThreadReady(tid);
+
     return 0;
 }
 

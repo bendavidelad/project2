@@ -15,6 +15,14 @@ Thread::Thread(void (*func)(void)){
     syncList = new list<int>();
 };
 
+Thread::Thread() {
+    state = READY;
+    quantums_num = 0;
+    function = NULL;
+    stack = malloc(STACK_SIZE);
+    syncList = new list<int>();
+}
+
 int Thread::getState(){
     return state;
 }
@@ -33,6 +41,7 @@ Thread::Thread(const Thread &&thread) {
 
 Thread::~Thread() {
     free (stack);
+    delete(syncList);
 }
 
 void Thread::setId(int id) {
@@ -77,3 +86,4 @@ void Thread::addThreadToSyncList(int tid) {
     }
 
 }
+

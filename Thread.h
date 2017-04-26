@@ -33,6 +33,8 @@ public:
 
     Thread(void (*func)(void));
 
+    Thread();
+
     int getState();
 
     int getQuantums();
