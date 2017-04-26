@@ -122,6 +122,7 @@ int uthread_init(int quantum_usecs) {
         cerr << ERROR_MSG + BAD_ALLOC_MSG << endl;
         return -1;
     }
+
     return 0;
 }
 
@@ -180,7 +181,6 @@ int uthread_terminate(int tid){
     deleteSyncList(tid);
     user->getHashMap().erase(tid);
     user->getLinkedList()->remove(tid);
-    user->getMinHeap().push(tid);
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
