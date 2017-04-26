@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
-
 #include "UserLevelManager.h"
 
 /*
@@ -14,8 +13,23 @@
 
 
 /* External interface */
-
+typedef unsigned long address_t;
+#define JB_SP 6
+#define JB_PC 7
 using namespace std;
+
+/* A translation is required when using an address of a variable.
+Use this as a black box in your code. */
+address_t translate_address(address_t addr)
+{
+    address_t ret;
+    asm volatile("xor    %%fs:0x30,%0\n"
+            "rol    $0x11,%0\n"
+    : "=g" (ret)
+    : "0" (addr));
+    return ret;
+}
+
 //the time structs
 int programQuantumUsecs;
 //the handler user manager instant
@@ -47,7 +61,6 @@ void runNextThread(){
     }
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     user->getHashMap()->at(runningThreadId)->upQuantum();
-    user->addQuantumNum();
 }
 
 void saveCurThread(){
@@ -166,9 +179,19 @@ int uthread_spawn(void (*f)(void)){
     user->addThreadCounter();
     thread->setId(tid);
     std::pair<int , shared_ptr<Thread>> newThread(tid, thread);
+
+
+    address_t sp = (address_t)*(thread->getStack()) + STACK_SIZE - sizeof(address_t);
+    address_t pc = (address_t)f;
+    sigsetjmp(env[tid], 1);
+    (env[tid]->__jmpbuf)[JB_SP] = translate_address(sp);
+    (env[tid]->__jmpbuf)[JB_PC] = translate_address(pc);
+    sigemptyset(&env[0]->__saved_mask);
+
+
     (*user->getHashMap()).insert(newThread);
     makeThreadReady(0);
-    return 0;
+    return tid;
 }
 
 

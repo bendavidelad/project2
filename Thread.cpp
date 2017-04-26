@@ -11,7 +11,7 @@ Thread::Thread(void (*func)(void)){
     state = READY;
     quantums_num = 0;
     function = func;
-    stack = malloc(STACK_SIZE);
+    stack = (char*)malloc(STACK_SIZE);
     syncList = new list<int>();
 };
 
@@ -77,5 +77,9 @@ void Thread::addThreadToSyncList(int tid) {
             syncList->push_back(tid);
     }
 
+}
+
+char* Thread::getStack() {
+    return stack;
 }
 

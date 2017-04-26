@@ -35,6 +35,8 @@ public:
 
     Thread();
 
+    char* getStack();
+
     int getState();
 
     int getQuantums();
@@ -60,7 +62,7 @@ private:
     int id;
     int quantums_num;
     void (*function)(void);
-    void* stack;
+    char* stack;
     sigjmp_buf envBuf;
     std::list<int> *syncList;
 
