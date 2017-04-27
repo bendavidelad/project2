@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 #include "uthreads.h"
 
 
@@ -27,7 +28,7 @@
 #define RUN 0
 #define DONE 1
 
-sigset_t set1, set2, set3;
+sigset_t set1, set2, set3, set4 , set5;
 
 char thread_status[NUM_THREADS];
 
@@ -49,13 +50,14 @@ void check_sig_mask(const sigset_t& expected)
     {
         sigset_t actual;
         sigprocmask(0, NULL, &actual);
-        printf("in check_sig_mask");
+
+
+
         if (memcmp(&expected, &actual, sizeof(sigset_t)) != 0)
         {
             printf(RED "ERROR - sigmask changed\n" RESET);
             exit(1);
         }
-        printf("in check_sigkkk_mask");
 
         // in the first 10 iterations let the thread stop because of sync / block.
         // in later iterations it will stop because of the timer
@@ -108,12 +110,23 @@ bool all_done()
 
 int main()
 {
+
+
     printf(GRN "Test 132:  " RESET);
     fflush(stdout);
 
     sigemptyset(&set1);
     sigemptyset(&set2);
     sigemptyset(&set3);
+    sigemptyset(&set4);
+    sigemptyset(&set5);
+
+
+    sigprocmask(0,NULL,&set4);
+
+    sigprocmask(0, NULL ,&set4);
+    sigprocmask(SIG_UNBLOCK, &set4, NULL);
+
 
     sigaddset(&set1, SIGBUS);
     sigaddset(&set1, SIGTERM);
@@ -132,10 +145,12 @@ int main()
 
     uthread_init(50);
 
+
     for (int i = 1; i < NUM_THREADS; i++)
     {
         thread_status[i] = RUN;
     }
+
 
     int t1 = uthread_spawn(thread1);
     int t2 = uthread_spawn(thread2);
@@ -149,7 +164,6 @@ int main()
 
 
     int tid = 0;
-    printLinkedList();
     while (!all_done())
     {
         // resume all threads, as each one of them is blocking himself

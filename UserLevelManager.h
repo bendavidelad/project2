@@ -70,7 +70,7 @@ public:
      *
      * @return
      */
-    std::list<int>* getLinkedList();
+    std::shared_ptr<std::list<int>> getLinkedList();
     /**
      *
      * @return
@@ -100,7 +100,7 @@ private:
     // the stl that contains the deleted threads id's
     std::shared_ptr<std::priority_queue<int, std::vector<int>, comparator>> minHeapDeletedThreads;
     //contains the ready states threads
-    std::list<int> *linkedList;
+    std::shared_ptr<std::list<int>> linkedList;
     //contains all the threads
     std::shared_ptr<std::unordered_map<int,std::shared_ptr<Thread>>> hashMap;
     int numOfQuantum;

@@ -107,11 +107,9 @@ void timer_handler(int sig)
 //    cout << "TIME EXPIRED" << endl;
 //    printLinkedList();
 
-    blockSignals();
     int runningThreadId = user->getLinkedList()->front();
     int ret_val  = sigsetjmp(env[runningThreadId],1);
     if (ret_val == 1) {
-        unBlockSignals();
         return;
     }
     user->getLinkedList()->pop_front();
@@ -198,9 +196,9 @@ int uthread_init(int quantum_usecs) {
  * On failure, return -1.
 */
 int uthread_spawn(void (*f)(void)){
-    blockSignals();
+//    blockSignals();
     if(user->getHashMap()->size() == user->getMaxthreadNum()){
-        unBlockSignals();
+//        unBlockSignals();
         return  -1;
     }
     std::shared_ptr<Thread> thread(new Thread(f));
@@ -222,7 +220,7 @@ int uthread_spawn(void (*f)(void)){
     sigemptyset(&env[0]->__saved_mask);
     (*user->getHashMap()).insert(newThread);
     makeThreadReady(tid);
-    unBlockSignals();
+//    unBlockSignals();
     return tid;
 }
 
@@ -239,15 +237,15 @@ int uthread_spawn(void (*f)(void)){
  * thread is terminated, the function does not return.
 */
 int uthread_terminate(int tid){
-    blockSignals();
+//    blockSignals();
     if (tid == 0){
         delete(user); //TODO memory leakage
-        unBlockSignals();
+//        unBlockSignals();
         exit(0);
      }
     if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
-        unBlockSignals();
+//        unBlockSignals();
         return -1;
     }
     deleteSyncList(tid);
@@ -259,7 +257,7 @@ int uthread_terminate(int tid){
         user->getHashMap()->at(runningThreadId)->upQuantum();
         user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         timeBoot();
-        unBlockSignals();
+//        unBlockSignals();
         siglongjmp(env[runningThreadId], 1);
 
     }else if(user->getHashMap()->at(tid)->getState() == READY){
@@ -267,7 +265,7 @@ int uthread_terminate(int tid){
     }
     user->getHashMap()->erase(tid);
     user->getMinHeap()->push(tid);
-    unBlockSignals();
+//    unBlockSignals();
     return 0;
 }
 
@@ -283,10 +281,10 @@ int uthread_terminate(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_block(int tid){
-    blockSignals();
+//    blockSignals();
     if ((tid == 0) || (user->getHashMap()->find(tid) == user->getHashMap()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
-        unBlockSignals();
+//        unBlockSignals();
         return -1;
     }
     if (user->getHashMap()->at(tid)->getState() == RUNNING) {
@@ -295,7 +293,7 @@ int uthread_block(int tid){
         //save current state **
         int ret_val = sigsetjmp(env[runningThreadId],1);
         if (ret_val == 1) {
-            unBlockSignals();
+//            unBlockSignals();
             return 0;
         }
         user->getHashMap()->at(tid)->setState(BLOCKED);
@@ -305,7 +303,7 @@ int uthread_block(int tid){
         user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         deleteSyncList(tid);
         timeBoot();
-        unBlockSignals();
+//        unBlockSignals();
         siglongjmp(env[runningThreadId],1);
    } else if (user->getHashMap()->at(tid)->getState() == READY){
         user->getLinkedList()->remove(tid);
@@ -313,7 +311,7 @@ int uthread_block(int tid){
     } else if (user->getHashMap()->at(tid)->getState() == SYNC_BLOCKED){
         user->getHashMap()->at(tid)->setState(BLOCKED_BOTH);
     }
-    unBlockSignals();
+//    unBlockSignals();
     return 0;
 }
 
@@ -326,10 +324,10 @@ int uthread_block(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_resume(int tid){
-    blockSignals();
+//    blockSignals();
     if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
-        unBlockSignals();
+//        unBlockSignals();
         return -1;
     }
     if ((user->getHashMap()->at(tid)->getState() == BLOCKED)){
@@ -337,7 +335,7 @@ int uthread_resume(int tid){
     }else if ((user->getHashMap()->at(tid)->getState() == BLOCKED_BOTH)){
         user->getHashMap()->at(tid)->setState(SYNC_BLOCKED);
     }
-    unBlockSignals();
+//    unBlockSignals();
     return 0;
 }
 
@@ -355,11 +353,11 @@ int uthread_resume(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_sync(int tid){
-    blockSignals();
+//    blockSignals();
     if ((user->getLinkedList()->front() == 0) || (user->getLinkedList()->front() == tid)||
             (user->getHashMap()->find(tid) == user->getHashMap()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
-        unBlockSignals();
+//        unBlockSignals();
         return -1;
     }
 
@@ -369,7 +367,7 @@ int uthread_sync(int tid){
     //save current state
     int ret_val = sigsetjmp(env[runningThreadId],1);
     if (ret_val == 1) {
-        unBlockSignals();
+//        unBlockSignals();
         return 0;
     }
 
@@ -383,7 +381,7 @@ int uthread_sync(int tid){
 
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
-    unBlockSignals();
+//    unBlockSignals();
     siglongjmp(env[runningThreadId],1);
 }
 

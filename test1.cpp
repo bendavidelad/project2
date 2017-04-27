@@ -59,11 +59,8 @@ int main()
         error();
     if (uthread_spawn(thread1) != 6)
         error();
-    printf("made 6 threads\n");
-    printLinkedList();
-    uthread_terminate(5);
-    printLinkedList();
 
+    uthread_terminate(5);
     if (uthread_spawn(thread1) != 5)
         error();
 
