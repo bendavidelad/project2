@@ -39,7 +39,7 @@ void Thread::setId(int id) {
 }
 
 void Thread::setState(int state) {
-    if (state > 2 || state < 0 ){
+    if (state > 4 || state < 0 ){
         throw std::invalid_argument(ERROR_MSG + "bad argument");
     }
     this->state = state;

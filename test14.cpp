@@ -120,47 +120,47 @@ int main()
         printf(RED "ERROR - wrong id for new thread\n" RESET);
         exit(1);
     }
-
+    printLinkedList();
     wait_quantums(2); // let t2 call sync(1)
 
-//    if (uthread_block(t2) == -1)
-//    {
-//        printf(RED "ERROR - uthread_block failed\n" RESET);
-//        exit(1);
-//    }
+    if (uthread_block(t2) == -1)
+    {
+        printf(RED "ERROR - uthread_block failed\n" RESET);
+        exit(1);
+    }
 
-    // now t2 should be synced AND blocked
+//     now t2 should be synced AND blocked
 
-//    uthread_resume(t2);
-//
-//
-//    wait_quantums(2); // give t2 a chance to get back, which is an error
-//
-//    uthread_resume(t1); // t1 will make sure that t2 didn't come back from sync.
-//
-//
-//    // case 2:
-//    // thread 4 call sync(3)
-//    // thread 4 is blocked
-//    // sync is released
-//
-//    int t3 = uthread_spawn(thread3);
-//    if (t3 != 3)
-//    {
-//        printf(RED "ERROR - wrong id for new thread\n" RESET);
-//        exit(1);
-//    }
-//    uthread_block(t3);
-//
-//    int t4 = uthread_spawn(thread4);
-//    wait_quantums(2); // let t4 call sync(3)
-//    uthread_block(t4);
-//
-//    uthread_resume(t3);
-//    wait_quantums(2); // let thread4 a chance to get back, which is an error
-//
-//
-//    printf(GRN "SUCCESS\n" RESET);
-//    uthread_terminate(0);
-//
+    uthread_resume(t2);
+
+
+    wait_quantums(2); // give t2 a chance to get back, which is an error
+
+    uthread_resume(t1); // t1 will make sure that t2 didn't come back from sync.
+
+
+    // case 2:
+    // thread 4 call sync(3)
+    // thread 4 is blocked
+    // sync is released
+
+    int t3 = uthread_spawn(thread3);
+    if (t3 != 3)
+    {
+        printf(RED "ERROR - wrong id for new thread\n" RESET);
+        exit(1);
+    }
+    uthread_block(t3);
+
+    int t4 = uthread_spawn(thread4);
+    wait_quantums(2); // let t4 call sync(3)
+    uthread_block(t4);
+
+    uthread_resume(t3);
+    wait_quantums(2); // let thread4 a chance to get back, which is an error
+
+
+    printf(GRN "SUCCESS\n" RESET);
+    uthread_terminate(0);
+
 }
