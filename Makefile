@@ -1,7 +1,7 @@
 CC=g++ -std=c++11
 RANLIB=ranlib
 
-LIBSRC= Thread.cpp Thread.h UserLevelManager.cpp UserLevelManager.h uthreads.cpp uthreads.h
+LIBSRC= Thread.cpp Thread.h UserLevelManager.cpp UserLevelManager.h uthreads.cpp 
 LIBOBJ= $(LIBSRC:.cpp=.o)
 
 INCS=-I.

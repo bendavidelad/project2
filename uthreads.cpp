@@ -210,6 +210,7 @@ int uthread_spawn(void (*f)(void)){
     sigemptyset(&env[0]->__saved_mask);
     (*user->getHashMap()).insert(newThread);
     makeThreadReady(tid);
+    cout <<"now we generate tid num: "<< tid<<endl;
     return tid;
 }
 
