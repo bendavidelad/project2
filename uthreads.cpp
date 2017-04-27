@@ -39,6 +39,9 @@ sigjmp_buf env[MAX_THREAD_NUM];
 
 
 void makeThreadReady(int tid){
+    if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
+        return;
+    }
     user->getHashMap()->at(tid)->setState(READY);
     user->getLinkedList()->push_back(tid);
 }
@@ -69,15 +72,17 @@ void saveCurThread(){
 }
 
 void deleteSyncList(int tid){
+
     shared_ptr<Thread> currThread = user->getHashMap()->at(tid);
-    if (currThread->getSyncList().size() == 0){
+    if (currThread->getSyncList()->size() == 0){
         return;
     }
+
     std::list<int>::const_iterator it;
-    for (it = currThread->getSyncList().begin(); it != currThread->getSyncList().end(); ++it){
+    for (it = currThread->getSyncList()->begin(); it != currThread->getSyncList()->end(); ++it){
         makeThreadReady(*it);
-        user->getLinkedList()->push_back(*it);
     }
+
     currThread->bootSyncList();
 }
 
@@ -337,6 +342,7 @@ int uthread_sync(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
+
     user->getHashMap()->at(tid)->addThreadToSyncList(user->getLinkedList()->front());
     int runningThreadId = user->getLinkedList()->front();
     user->getLinkedList()->pop_front();
@@ -345,9 +351,13 @@ int uthread_sync(int tid){
     if (ret_val == 1) {
         return -1;
     }
+
     deleteSyncList(user->getLinkedList()->front());
+
     user->getHashMap()->at(user->getLinkedList()->front())->setState(BLOCKED);
+
     user->addQuantumNum();
+
     runningThreadId = user->getLinkedList()->front();
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);

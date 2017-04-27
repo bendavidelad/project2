@@ -5,6 +5,7 @@
 
 #include <setjmp.h>
 #include <list>
+#include <memory>
 
 static const int READY = 0;
 static const int RUNNING = 1;
@@ -51,7 +52,7 @@ public:
 
     void setEnvBuf ();
 
-    std::list<int> getSyncList();
+    std::shared_ptr<std::list<int>> getSyncList();
 
     void addThreadToSyncList(int tid);
 
@@ -64,7 +65,7 @@ private:
     void (*function)(void);
     char* stack;
     sigjmp_buf envBuf;
-    std::list<int> *syncList;
+    std::shared_ptr<std::list<int>> syncList;
 
 };
 

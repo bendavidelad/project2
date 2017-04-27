@@ -7,12 +7,11 @@
 static const std::string ERROR_MSG = "system error:";
 using namespace std;
 
-Thread::Thread(void (*func)(void)){
+Thread::Thread(void (*func)(void)):syncList(new std::list<int>){
     state = READY;
     quantums_num = 0;
     function = func;
     stack = (char*)malloc(STACK_SIZE);
-    syncList = new list<int>();
 };
 
 int Thread::getState(){
@@ -33,7 +32,6 @@ Thread::Thread(const Thread &&thread) {
 
 Thread::~Thread() {
     free (stack);
-    delete(syncList);
 }
 
 void Thread::setId(int id) {
@@ -59,8 +57,8 @@ void Thread::bootSyncList() {
     syncList->clear();
 }
 
-std::list<int> Thread::getSyncList() {
-    return *syncList;
+std::shared_ptr<std::list<int>> Thread::getSyncList() {
+    return syncList;
 }
 
 void Thread::addThreadToSyncList(int tid) {
