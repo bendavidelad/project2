@@ -10,6 +10,8 @@
 static const int READY = 0;
 static const int RUNNING = 1;
 static const int BLOCKED = 2;
+static const int SYNC_BLOCKED = 3;
+static const int BLOCKED_BOTH = 4;
 typedef void (*voidFn)();
 
 

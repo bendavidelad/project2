@@ -80,7 +80,12 @@ void deleteSyncList(int tid){
 
     std::list<int>::const_iterator it;
     for (it = currThread->getSyncList()->begin(); it != currThread->getSyncList()->end(); ++it){
-        makeThreadReady(*it);
+        if (user->getHashMap()->at(*it)->getState() == SYNC_BLOCKED)
+        {
+            makeThreadReady(*it);
+        } else if (user->getHashMap()->at(*it)->getState() == BLOCKED_BOTH){
+            user->getHashMap()->at(*it)->setState(BLOCKED);
+        }
     }
 
     currThread->bootSyncList();
@@ -282,9 +287,9 @@ int uthread_block(int tid){
         //save current state **TODO verify
         int ret_val = sigsetjmp(env[runningThreadId],1);
         if (ret_val == 1) {
-            return -1;
+            return 0;
         }
-        user->getHashMap()->at(tid)->setState(2);
+        user->getHashMap()->at(tid)->setState(BLOCKED);
         user->addQuantumNum();
         runningThreadId = user->getLinkedList()->front();
 //    cout << "Running " << runningThreadId <<endl;
@@ -296,6 +301,8 @@ int uthread_block(int tid){
    } else if (user->getHashMap()->at(tid)->getState() == READY){
         user->getLinkedList()->remove(tid);
         user->getHashMap()->at(tid)->setState(BLOCKED);
+    } else if (user->getHashMap()->at(tid)->getState() == SYNC_BLOCKED){
+        user->getHashMap()->at(tid)->setState(BLOCKED_BOTH);
     }
     return 0;
 
@@ -314,13 +321,14 @@ int uthread_resume(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if ((user->getHashMap()->at(tid)->getState() == 0) ||
-            (user->getHashMap()->at(tid)->getState() == 1)){
-        return 0;
-    } else {
+    if ((user->getHashMap()->at(tid)->getState() == READY) ||
+            (user->getHashMap()->at(tid)->getState() == RUNNING)){
+    } else if ((user->getHashMap()->at(tid)->getState() == BLOCKED)){
         makeThreadReady(tid);
-        return 0;
+    }else if ((user->getHashMap()->at(tid)->getState() == BLOCKED_BOTH)){
+        user->getHashMap()->at(tid)->setState(SYNC_BLOCKED);
     }
+    return 0;
 }
 
 
@@ -337,8 +345,8 @@ int uthread_resume(int tid){
  * Return value: On success, return 0. On failure, return -1.
 */
 int uthread_sync(int tid){
-    if ((user->getLinkedList()->front() == 0) ||(user->getHashMap()->find(tid) == user->getHashMap
-            ()->end())){
+    if ((user->getLinkedList()->front() == 0) || (user->getLinkedList()->front() == tid)||
+            (user->getHashMap()->find(tid) == user->getHashMap()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
@@ -346,15 +354,15 @@ int uthread_sync(int tid){
     user->getHashMap()->at(tid)->addThreadToSyncList(user->getLinkedList()->front());
     int runningThreadId = user->getLinkedList()->front();
     user->getLinkedList()->pop_front();
-    //save current state **TODO verify
+    //save current state
     int ret_val = sigsetjmp(env[runningThreadId],1);
     if (ret_val == 1) {
-        return -1;
+        return 0;
     }
 
     deleteSyncList(user->getLinkedList()->front());
 
-    user->getHashMap()->at(user->getLinkedList()->front())->setState(BLOCKED);
+    user->getHashMap()->at(runningThreadId)->setState(SYNC_BLOCKED);
 
     user->addQuantumNum();
 
