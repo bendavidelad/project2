@@ -22,7 +22,7 @@ void f (void)
 		}
 		j++;
 		if (j%1000000 == 0){
-			cout << "ENTERED F" << endl;
+//			cout << "ENTERED F" << endl;
 		}
 
 	}

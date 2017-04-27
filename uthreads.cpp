@@ -48,7 +48,7 @@ void makeThreadReady(int tid){
 void runNextThread(){
     user->addQuantumNum();
     int runningThreadId = user->getLinkedList()->front();
-    cout << "Running " << runningThreadId <<endl;
+//    cout << "Running " << runningThreadId <<endl;
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
@@ -87,8 +87,8 @@ void deleteSyncList(int tid){
  */
 void timer_handler(int sig)
 {
-    cout << "TIME EXPIRED" << endl;
-    printLinkedList();
+//    cout << "TIME EXPIRED" << endl;
+//    printLinkedList();
 
 
     int runningThreadId = user->getLinkedList()->front();
@@ -105,7 +105,7 @@ void timer_handler(int sig)
 
     user->addQuantumNum();
     runningThreadId = user->getLinkedList()->front();
-    cout << "Running " << runningThreadId <<endl;
+//    cout << "Running " << runningThreadId <<endl;
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
 //    if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
