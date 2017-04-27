@@ -48,19 +48,17 @@ void makeThreadReady(int tid){
 void runNextThread(){
     user->addQuantumNum();
     int runningThreadId = user->getLinkedList()->front();
+    cout << "Running " << runningThreadId <<endl;
     user->getHashMap()->at(runningThreadId)->upQuantum();
+    user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
+        if (user->getHashMap()->at(runningThreadId)->getQuantums() > 3){
+            while(1){}
+        }
         return;
     }
-    //check whither the function runs in the first time and in the if branches it "booted" up
-    //else using siglongjmp we continue the run of the tread from the last time
-    if(user->getHashMap()->at(runningThreadId)->getQuantums() == 0) {
-        user->getHashMap()->at(runningThreadId)->getFunction()();
-    }else{
-        siglongjmp(env[runningThreadId],1);
-    }
-    user->getHashMap()->at(runningThreadId)->setState(RUNNING);
-    user->getHashMap()->at(runningThreadId)->upQuantum();
+    siglongjmp(env[runningThreadId],1);
+
 }
 
 void saveCurThread(){
@@ -89,6 +87,8 @@ void deleteSyncList(int tid){
  */
 void timer_handler(int sig)
 {
+    cout << "TIME EXPIRED" << endl;
+    printLinkedList();
     int runningThreadId = user->getLinkedList()->front();
     saveCurThread();
     deleteSyncList(runningThreadId);
@@ -98,7 +98,6 @@ void timer_handler(int sig)
 }
 
 void timeBoot(){
-    cout << "CHECK " << endl;
     struct sigaction sa;
     struct itimerval timer;
 
@@ -108,12 +107,12 @@ void timeBoot(){
         printf("sigaction error.");
     }
     // Configure the timer to expire after 1 sec... */
-    timer.it_value.tv_sec = 2;		// first time interval, seconds part
-    timer.it_value.tv_usec = 0;		// first time interval, seconds part
+    timer.it_value.tv_sec = 0;		// first time interval, seconds part
+    timer.it_value.tv_usec = programQuantumUsecs;		// first time interval, seconds part
 
     // configure the timer to expire every 3 sec after that.
-    timer.it_interval.tv_sec = 3;	// following time intervals, seconds part
-    timer.it_interval.tv_usec = 0;	// fo
+    timer.it_interval.tv_sec = 0;	// following time intervals, seconds part
+    timer.it_interval.tv_usec = programQuantumUsecs;	// fo
     if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
         printf("setitimer error.");
     }
@@ -187,8 +186,6 @@ int uthread_spawn(void (*f)(void)){
     (env[tid]->__jmpbuf)[JB_SP] = translate_address(sp);
     (env[tid]->__jmpbuf)[JB_PC] = translate_address(pc);
     sigemptyset(&env[0]->__saved_mask);
-
-
     (*user->getHashMap()).insert(newThread);
     makeThreadReady(tid);
     return tid;
@@ -354,3 +351,11 @@ int uthread_get_quantums(int tid){
 }
 
 
+void printLinkedList(){
+    std::list<int>::const_iterator iterator;
+    for (iterator = user->getLinkedList()->begin(); iterator != user->getLinkedList()->end();
+         ++iterator) {
+        std::cout << *iterator << "<--";
+    }
+    cout << endl;
+}

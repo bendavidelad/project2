@@ -2,10 +2,12 @@
 
 #include <iostream>
 
+using namespace std;
 void f (void)
 {
 	int tid = uthread_get_tid();
 	int i = 1;
+	int j = 0;
 	while(1)
 	{
 		if(i == uthread_get_quantums(tid))
@@ -17,6 +19,10 @@ void f (void)
 				uthread_terminate(tid);
 			}
 			i++;
+		}
+		j++;
+		if (j%1000000 == 0){
+			cout << "ENTERED F" << endl;
 		}
 
 	}
@@ -47,7 +53,7 @@ int main(void)
 {
 	try
 	{
-		uthread_init(100);
+		uthread_init(900000);
 		int tid = uthread_get_tid();
 		int i = 1;
 		std::cout << "Thread:m Number:(0) " << tid << std::endl;
@@ -62,7 +68,7 @@ int main(void)
 				if (i == 3)
 				{
 					std::cout << "m spawns f at (1) " << uthread_spawn(f) << std::endl;
-					std::cout << "m spawns g at (2) " << uthread_spawn(g) << std::endl;
+//					std::cout << "m spawns g at (2) " << uthread_spawn(g) << std::endl;
 				}
 				if (i == 10)
 				{
