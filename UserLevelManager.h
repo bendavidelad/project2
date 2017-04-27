@@ -65,7 +65,7 @@ public:
      *
      * @return
      */
-    minHeap getMinHeap();
+    std::shared_ptr<std::priority_queue<int, std::vector<int>, comparator>> getMinHeap();
     /**
      *
      * @return
@@ -98,7 +98,7 @@ public:
 
 private:
     // the stl that contains the deleted threads id's
-    minHeap *minHeapDeletedThreads;
+    std::shared_ptr<std::priority_queue<int, std::vector<int>, comparator>> minHeapDeletedThreads;
     //contains the ready states threads
     std::list<int> *linkedList;
     //contains all the threads

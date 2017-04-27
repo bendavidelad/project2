@@ -191,11 +191,11 @@ int uthread_spawn(void (*f)(void)){
     }
     std::shared_ptr<Thread> thread(new Thread(f));
     int tid;
-    if(user->getMinHeap().empty()){
+    if(user->getMinHeap()->empty()){
         tid = user->getThreadCounter();
     } else{
-        tid = user->getMinHeap().top();
-        user->getMinHeap().pop();
+        tid = user->getMinHeap()->top();
+        user->getMinHeap()->pop();
     }
     user->addThreadCounter();
     thread->setId(tid);
@@ -210,7 +210,6 @@ int uthread_spawn(void (*f)(void)){
     sigemptyset(&env[0]->__saved_mask);
     (*user->getHashMap()).insert(newThread);
     makeThreadReady(tid);
-    cout <<"now we generate tid num: "<< tid<<endl;
     return tid;
 }
 
@@ -235,10 +234,10 @@ int uthread_terminate(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
+
     deleteSyncList(tid);
-    user->getHashMap()->erase(tid);
-    user->getMinHeap().push(tid);
-    if (user->getLinkedList()->front() == tid){
+
+    if (user->getLinkedList()->front() == tid) {
         user->getLinkedList()->pop_front();
         user->addQuantumNum();
         int runningThreadId = user->getLinkedList()->front();
@@ -246,9 +245,13 @@ int uthread_terminate(int tid){
         user->getHashMap()->at(runningThreadId)->upQuantum();
         user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         timeBoot();
-        siglongjmp(env[runningThreadId],1);
+        siglongjmp(env[runningThreadId], 1);
 
+    }else if(user->getHashMap()->at(tid)->getState() == READY){
+        user->getLinkedList()->remove(tid);
     }
+    user->getHashMap()->erase(tid);
+    user->getMinHeap()->push(tid);
     return 0;
 }
 
