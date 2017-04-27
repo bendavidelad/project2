@@ -89,11 +89,33 @@ void timer_handler(int sig)
 {
     cout << "TIME EXPIRED" << endl;
     printLinkedList();
+
+
     int runningThreadId = user->getLinkedList()->front();
-    saveCurThread();
+    int ret_val  = sigsetjmp(env[runningThreadId],1);
+    if (ret_val == 1) {
+        return;
+    }
+    user->getLinkedList()->pop_front();
+
+    //save current state **TODO verify
     deleteSyncList(runningThreadId);
     makeThreadReady(runningThreadId);
-    runNextThread();
+
+
+    user->addQuantumNum();
+    runningThreadId = user->getLinkedList()->front();
+    cout << "Running " << runningThreadId <<endl;
+    user->getHashMap()->at(runningThreadId)->upQuantum();
+    user->getHashMap()->at(runningThreadId)->setState(RUNNING);
+//    if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
+//        if (user->getHashMap()->at(runningThreadId)->getQuantums() > 3){
+//            while(1){}
+//        }
+//        return;
+//    }
+    siglongjmp(env[runningThreadId],1);
+
 
 }
 
@@ -206,7 +228,7 @@ int uthread_spawn(void (*f)(void)){
 int uthread_terminate(int tid){
     if (tid == 0){
         delete(user);
-        exit(0); //TODO
+        exit(0);
      }
     if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
