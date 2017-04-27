@@ -227,7 +227,7 @@ int uthread_spawn(void (*f)(void)){
 */
 int uthread_terminate(int tid){
     if (tid == 0){
-        delete(user);
+        delete(user); //TODO memory leakage
         exit(0);
      }
     if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
@@ -236,17 +236,16 @@ int uthread_terminate(int tid){
     }
     deleteSyncList(tid);
     user->getHashMap()->erase(tid);
-    user->getLinkedList()->remove(tid);
     user->getMinHeap().push(tid);
     if (user->getLinkedList()->front() == tid){
         user->getLinkedList()->pop_front();
-        shared_ptr<Thread> newRunningThread = user->getHashMap()->at(user->getLinkedList()->front());
-        newRunningThread->setState(1);
-        runNextThread();
-        newRunningThread->getFunction()(); // run the new thread
+        user->addQuantumNum();
+        int runningThreadId = user->getLinkedList()->front();
+//    cout << "Running " << runningThreadId <<endl;
+        user->getHashMap()->at(runningThreadId)->upQuantum();
+        user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         timeBoot();
-    } else {
-        user->getLinkedList()->remove(tid);
+        siglongjmp(env[runningThreadId],1);
 
     }
     return 0;
