@@ -321,9 +321,7 @@ int uthread_resume(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if ((user->getHashMap()->at(tid)->getState() == READY) ||
-            (user->getHashMap()->at(tid)->getState() == RUNNING)){
-    } else if ((user->getHashMap()->at(tid)->getState() == BLOCKED)){
+    if ((user->getHashMap()->at(tid)->getState() == BLOCKED)){
         makeThreadReady(tid);
     }else if ((user->getHashMap()->at(tid)->getState() == BLOCKED_BOTH)){
         user->getHashMap()->at(tid)->setState(SYNC_BLOCKED);
