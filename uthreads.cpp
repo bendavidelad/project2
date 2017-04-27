@@ -360,15 +360,17 @@ int uthread_sync(int tid){
         return 0;
     }
 
-    deleteSyncList(user->getLinkedList()->front());
+    deleteSyncList(runningThreadId);
 
     user->getHashMap()->at(runningThreadId)->setState(SYNC_BLOCKED);
 
     user->addQuantumNum();
 
     runningThreadId = user->getLinkedList()->front();
+
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
+
     siglongjmp(env[runningThreadId],1);
 }
 
