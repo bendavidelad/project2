@@ -33,14 +33,14 @@ address_t translate_address(address_t addr)
 void blockSignals(){
     sigset_t x;
     sigemptyset (&x);
-    sigaddset(&x, SIGUSR1);
+    sigaddset(&x, SIGVTALRM);
     sigprocmask(SIG_BLOCK, &x, NULL);
 }
 
 void unBlockSignals(){
     sigset_t x;
     sigemptyset (&x);
-    sigaddset(&x, SIGUSR1);
+    sigaddset(&x, SIGVTALRM);
     sigprocmask(SIG_UNBLOCK, &x, NULL);
 
 }
@@ -66,10 +66,10 @@ void makeThreadReady(int tid){
 void runNextThread(){
     user->addQuantumNum();
     int runningThreadId = user->getLinkedList()->front();
-//    cout << "Running oujhiuhiuhoiuj" << runningThreadId <<endl;
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
+        unBlockSignals();
         return;
     }
     unBlockSignals();
@@ -77,15 +77,6 @@ void runNextThread(){
 
 }
 
-void saveCurThread(){
-    int runningThreadId = user->getLinkedList()->front();
-    user->getLinkedList()->pop_front();
-    //save current state **TODO verify
-    int ret_val = sigsetjmp(env[runningThreadId],1);
-    if (ret_val == 1) {
-        return;
-    }
-}
 
 void deleteSyncList(int tid){
 
@@ -116,18 +107,18 @@ void timer_handler(int sig)
 //    cout << "TIME EXPIRED" << endl;
 //    printLinkedList();
 
-
+    blockSignals();
     int runningThreadId = user->getLinkedList()->front();
     int ret_val  = sigsetjmp(env[runningThreadId],1);
     if (ret_val == 1) {
+        unBlockSignals();
         return;
     }
     user->getLinkedList()->pop_front();
 
-    //save current state **TODO verify
+    //save current state
     deleteSyncList(runningThreadId);
     makeThreadReady(runningThreadId);
-
 
     user->addQuantumNum();
     runningThreadId = user->getLinkedList()->front();
@@ -135,12 +126,13 @@ void timer_handler(int sig)
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     unBlockSignals();
     siglongjmp(env[runningThreadId],1);
+
 }
 
 void timeBoot(){
     struct sigaction sa;
     struct itimerval timer;
-
+    blockSignals();
     sa.sa_handler = &timer_handler;
 
     if (sigaction(SIGVTALRM, &sa,NULL) < 0) {
@@ -156,7 +148,7 @@ void timeBoot(){
     if (setitimer (ITIMER_VIRTUAL, &timer, NULL)) {
         printf("setitimer error.");
     }
-
+    unBlockSignals();
 }
 
 /*
@@ -172,6 +164,7 @@ int uthread_init(int quantum_usecs) {
     //check if the args is valid
     if (quantum_usecs <= 0 ){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        unBlockSignals();
         return -1;
     }
 
@@ -207,6 +200,7 @@ int uthread_init(int quantum_usecs) {
 int uthread_spawn(void (*f)(void)){
     blockSignals();
     if(user->getHashMap()->size() == user->getMaxthreadNum()){
+        unBlockSignals();
         return  -1;
     }
     std::shared_ptr<Thread> thread(new Thread(f));
@@ -220,8 +214,6 @@ int uthread_spawn(void (*f)(void)){
     user->addThreadCounter();
     thread->setId(tid);
     std::pair<int , shared_ptr<Thread>> newThread(tid, thread);
-
-
     address_t sp = (address_t)(thread->getStack()) + STACK_SIZE - sizeof(address_t);
     address_t pc = (address_t)f;
     sigsetjmp(env[tid], 1);
@@ -250,20 +242,20 @@ int uthread_terminate(int tid){
     blockSignals();
     if (tid == 0){
         delete(user); //TODO memory leakage
+        unBlockSignals();
         exit(0);
      }
     if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        unBlockSignals();
         return -1;
     }
-
     deleteSyncList(tid);
 
     if (user->getLinkedList()->front() == tid) {
         user->getLinkedList()->pop_front();
         user->addQuantumNum();
         int runningThreadId = user->getLinkedList()->front();
-//    cout << "Running " << runningThreadId <<endl;
         user->getHashMap()->at(runningThreadId)->upQuantum();
         user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         timeBoot();
@@ -294,20 +286,21 @@ int uthread_block(int tid){
     blockSignals();
     if ((tid == 0) || (user->getHashMap()->find(tid) == user->getHashMap()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        unBlockSignals();
         return -1;
     }
     if (user->getHashMap()->at(tid)->getState() == RUNNING) {
         int runningThreadId = user->getLinkedList()->front();
         user->getLinkedList()->pop_front();
-        //save current state **TODO verify
+        //save current state **
         int ret_val = sigsetjmp(env[runningThreadId],1);
         if (ret_val == 1) {
+            unBlockSignals();
             return 0;
         }
         user->getHashMap()->at(tid)->setState(BLOCKED);
         user->addQuantumNum();
         runningThreadId = user->getLinkedList()->front();
-//    cout << "Running " << runningThreadId <<endl;
         user->getHashMap()->at(runningThreadId)->upQuantum();
         user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         deleteSyncList(tid);
@@ -322,7 +315,6 @@ int uthread_block(int tid){
     }
     unBlockSignals();
     return 0;
-
 }
 
 
@@ -337,6 +329,7 @@ int uthread_resume(int tid){
     blockSignals();
     if (user->getHashMap()->find(tid) == user->getHashMap()->end()){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        unBlockSignals();
         return -1;
     }
     if ((user->getHashMap()->at(tid)->getState() == BLOCKED)){
@@ -366,6 +359,7 @@ int uthread_sync(int tid){
     if ((user->getLinkedList()->front() == 0) || (user->getLinkedList()->front() == tid)||
             (user->getHashMap()->find(tid) == user->getHashMap()->end())){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
+        unBlockSignals();
         return -1;
     }
 
@@ -375,6 +369,7 @@ int uthread_sync(int tid){
     //save current state
     int ret_val = sigsetjmp(env[runningThreadId],1);
     if (ret_val == 1) {
+        unBlockSignals();
         return 0;
     }
 
@@ -390,7 +385,6 @@ int uthread_sync(int tid){
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     unBlockSignals();
     siglongjmp(env[runningThreadId],1);
-    unBlockSignals();
 }
 
 

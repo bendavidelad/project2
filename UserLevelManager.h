@@ -107,9 +107,6 @@ private:
     int maxThreadsNum;
     unsigned int threadCounter;
     unsigned int quantomUsecs;
-
-    //std:pair<int,int> shopping(3,4);TODO font forget to kaki
-
 };
 
 
