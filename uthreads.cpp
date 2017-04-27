@@ -48,13 +48,10 @@ void makeThreadReady(int tid){
 void runNextThread(){
     user->addQuantumNum();
     int runningThreadId = user->getLinkedList()->front();
-//    cout << "Running " << runningThreadId <<endl;
+//    cout << "Running oujhiuhiuhoiuj" << runningThreadId <<endl;
     user->getHashMap()->at(runningThreadId)->upQuantum();
     user->getHashMap()->at(runningThreadId)->setState(RUNNING);
     if (user->getHashMap()->at(runningThreadId)->getFunction() == NULL){
-        if (user->getHashMap()->at(runningThreadId)->getQuantums() > 3){
-            while(1){}
-        }
         return;
     }
     siglongjmp(env[runningThreadId],1);
@@ -65,7 +62,10 @@ void saveCurThread(){
     int runningThreadId = user->getLinkedList()->front();
     user->getLinkedList()->pop_front();
     //save current state **TODO verify
-    sigsetjmp(env[runningThreadId],1);
+    int ret_val = sigsetjmp(env[runningThreadId],1);
+    if (ret_val == 1) {
+        return;
+    }
 }
 
 void deleteSyncList(int tid){
@@ -267,15 +267,26 @@ int uthread_block(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if (user->getHashMap()->at(tid)->getState() == 1) {
-        saveCurThread();
+    if (user->getHashMap()->at(tid)->getState() == RUNNING) {
+        int runningThreadId = user->getLinkedList()->front();
+        user->getLinkedList()->pop_front();
+        //save current state **TODO verify
+        int ret_val = sigsetjmp(env[runningThreadId],1);
+        if (ret_val == 1) {
+            return -1;
+        }
         user->getHashMap()->at(tid)->setState(2);
-        runNextThread();
+        user->addQuantumNum();
+        runningThreadId = user->getLinkedList()->front();
+//    cout << "Running " << runningThreadId <<endl;
+        user->getHashMap()->at(runningThreadId)->upQuantum();
+        user->getHashMap()->at(runningThreadId)->setState(RUNNING);
         deleteSyncList(tid);
         timeBoot();
-   } else if (user->getHashMap()->at(tid)->getState() == 0){
+        siglongjmp(env[runningThreadId],1);
+   } else if (user->getHashMap()->at(tid)->getState() == READY){
         user->getLinkedList()->remove(tid);
-        user->getHashMap()->at(tid)->setState(2);
+        user->getHashMap()->at(tid)->setState(BLOCKED);
     }
     return 0;
 
@@ -294,8 +305,8 @@ int uthread_resume(int tid){
         cerr << ERROR_MSG + BAD_ARG_MSG << endl;
         return -1;
     }
-    if ((user->getHashMap()->at(tid)->getState() == 0) || (user->getHashMap()->at(tid)->getState()
-                                                          == 1)){
+    if ((user->getHashMap()->at(tid)->getState() == 0) ||
+            (user->getHashMap()->at(tid)->getState() == 1)){
         return 0;
     } else {
         makeThreadReady(tid);
@@ -323,12 +334,20 @@ int uthread_sync(int tid){
         return -1;
     }
     user->getHashMap()->at(tid)->addThreadToSyncList(user->getLinkedList()->front());
-    saveCurThread();
+    int runningThreadId = user->getLinkedList()->front();
+    user->getLinkedList()->pop_front();
+    //save current state **TODO verify
+    int ret_val = sigsetjmp(env[runningThreadId],1);
+    if (ret_val == 1) {
+        return -1;
+    }
     deleteSyncList(user->getLinkedList()->front());
-    user->getHashMap()->at(user->getLinkedList()->front())->setState(2);
-    runNextThread();
-    return 0;
-
+    user->getHashMap()->at(user->getLinkedList()->front())->setState(BLOCKED);
+    user->addQuantumNum();
+    runningThreadId = user->getLinkedList()->front();
+    user->getHashMap()->at(runningThreadId)->upQuantum();
+    user->getHashMap()->at(runningThreadId)->setState(RUNNING);
+    siglongjmp(env[runningThreadId],1);
 }
 
 
